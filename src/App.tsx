@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Lang, t } from './i18n';
 import * as db from './db';
+import Library from './Library';
 
 type Settings = { id: 'app'; lang: Lang; theme: 'light' | 'dark' };
 type Meas = { id: string; date: string; weightKg: number };
 
 export default function App() {
   const [s, setS] = useState<Settings>({ id: 'app', lang: 'ar', theme: 'dark' });
-  const [tab, setTab] = useState<'home' | 'data'>('home');
+  const [tab, setTab] = useState<'home' | 'lib' | 'data'>('home');
   const [meas, setMeas] = useState<Meas[]>([]);
   const [w, setW] = useState('');
   const [msg, setMsg] = useState('');
@@ -66,6 +67,7 @@ export default function App() {
               <ul>{meas.map((m) => <li key={m.id}><span>{m.date}</span><b>{m.weightKg} kg</b><button className="ghost" onClick={async () => { await db.remove('measurements', m.id); load(); }}>✕</button></li>)}</ul>}
           </section>
         )}
+        {tab === 'lib' && <Library lang={s.lang} />}
         {tab === 'data' && (
           <section className="card">
             <h2>💾 {T('data')}</h2>
@@ -83,6 +85,7 @@ export default function App() {
       </main>
       <nav>
         <button className={tab === 'home' ? 'on' : ''} onClick={() => setTab('home')}>🏠 {T('home')}</button>
+        <button className={tab === 'lib' ? 'on' : ''} onClick={() => setTab('lib')}>📚 {T('lib')}</button>
         <button className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}>💾 {T('data')}</button>
       </nav>
     </div>
