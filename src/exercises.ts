@@ -1,6 +1,7 @@
 export const MUSCLES = ['chest', 'back', 'legs', 'shoulders', 'arms', 'core'] as const;
 // p = illustration pose; sar/sen = steps separated by "|"
-export const EXERCISES = [
+import { EXTRA_EX } from './exercisesExtra';
+const BASE = [
  { id:'pushup', ar:'تمرين الضغط', en:'Push-up', m:'chest', p:'push', sar:'ضع يديك أسفل الكتفين والجسم مستقيم|انزل بالصدر نحو الأرض|ادفع للأعلى دون ارتخاء الورك', sen:'Hands under shoulders, body straight|Lower chest toward the floor|Push up without sagging hips' },
  { id:'widepush', ar:'ضغط واسع', en:'Wide push-up', m:'chest', p:'push', sar:'باعد يديك أوسع من الكتفين|انزل ببطء|ادفع بقوة للأعلى', sen:'Hands wider than shoulders|Lower slowly|Press up hard' },
  { id:'kneepush', ar:'ضغط على الركبتين', en:'Knee push-up', m:'chest', p:'push', sar:'اسند ركبتيك على الأرض|حافظ على خط مستقيم من الركبة للرأس|انزل وارتفع بتحكم', sen:'Rest knees on the floor|Keep a straight line from knees to head|Lower and rise with control' },
@@ -16,3 +17,5 @@ export const EXERCISES = [
  { id:'hammer', ar:'تمرين المطرقة', en:'Hammer curl', m:'arms', p:'curl', sar:'اجعل راحتيك متقابلتين|اثنِ الذراع دون تحريك المرفق|انزل بتحكم', sen:'Palms face each other|Curl without moving the elbow|Lower with control' },
  { id:'plank', ar:'بلانك', en:'Plank', m:'core', p:'plank', sar:'ارتكز على ساعديك وأصابع قدميك|شدّ البطن وحافظ على جسم مستقيم|تنفس بانتظام وثبّت', sen:'Rest on forearms and toes|Brace abs, keep body straight|Breathe steadily and hold' },
 ];
+
+export const EXERCISES = [...BASE, ...EXTRA_EX];

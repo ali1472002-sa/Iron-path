@@ -1,5 +1,9 @@
 // Extra data for each built-in exercise in exercises.ts. To add an exercise: add it there, then add its row in META.
+import { EXTRA_META, TIPS as EXTRA_TIPS } from './exercisesExtra';
 export const LB: Record<string, [string, string]> = {
+  calves:['السمانة','Calves'], obliques:['العضلات المائلة','Obliques'], traps:['شبه المنحرف','Trapezius'], neck:['الرقبة','Neck'], abductors:['المبعِّدات','Abductors'], adductors:['المقرِّبات','Adductors'],
+  cable:['كابل','Cable'], machine:['جهاز','Machine'], band:['شريط مقاومة','Resistance band'], kettlebell:['كيتلبل','Kettlebell'], other:['أخرى','Other'],
+  t_mob:['مرونة','Mobility'], t_cond:['لياقة / كارديو','Conditioning'], t_warm:['إحماء','Warm-up'],
   pecs:['عضلات الصدر','Pectorals'], lats:['الظهرية العريضة','Latissimus dorsi'], upback:['أعلى الظهر','Upper back'], lowback:['أسفل الظهر','Lower back'],
   quads:['الفخذ الأمامية','Quadriceps'], glutes:['الألوية','Glutes'], hams:['الفخذ الخلفية','Hamstrings'], delts:['الكتف','Deltoids'],
   biceps:['ذات الرأسين','Biceps'], triceps:['ثلاثية الرؤوس','Triceps'], forearms:['الساعدان','Forearms'], abs:['عضلات البطن','Abdominals'],
@@ -8,7 +12,8 @@ export const LB: Record<string, [string, string]> = {
   b:['مبتدئ','Beginner'], i:['متوسط','Intermediate'], a:['متقدم','Advanced'],
 };
 export const U: Record<string, [string, string]> = {
-  all:['الكل','All'], m:['العضلة','Muscle'], eq:['المعدات','Equipment'], ty:['النوع','Type'], lv:['المستوى','Level'], back:['رجوع','Back'],
+  all:['الكل','All'], rx:['الجرعة المقترحة (للتضخيم، قابلة للتعديل)','Suggested dose (hypertrophy, adjustable)'], prog:['التدرّج: عند إكمال كل المجموعات بأعلى تكرار، زد الحمل زيادة صغيرة. توقف عند الألم ولا تتمرّن رغمه.','Progression: when every set reaches the top of the range, add a small load. Stop at pain; never train through it.'], alts:['بدائل من المكتبة','Alternatives from the library'], restW:['راحة','rest'], noFig:['لا يتوفر رسم لهذا التمرين؛ اتبع الخطوات النصية.','No illustration for this exercise; follow the text steps.'], more:['عرض المزيد','Show more'],
+  importEx:['استيراد تمارين (free-exercise-db JSON)','Import exercises (free-exercise-db JSON)'], importHelp:['نزّل exercises.json من مستودع yuhonas/free-exercise-db (ترخيص Unlicense) ثم اخترها هنا. الإنجليزية فقط، بدون صور.','Download exercises.json from yuhonas/free-exercise-db (Unlicense), then pick it here. English only, no images.'], repKey:['أُضيف / حُدِّث / تُجوهل / رُفض / شبه مكرر','imported / updated / skipped / rejected / near-dup'], delImp:['حذف كل التمارين المستوردة','Delete all imported exercises'], m:['العضلة','Muscle'], eq:['المعدات','Equipment'], ty:['النوع','Type'], lv:['المستوى','Level'], back:['رجوع','Back'],
   primary:['العضلات الرئيسية','Primary muscles'], secondary:['العضلات الثانوية','Secondary muscles'], steps:['خطوات الأداء','How to perform'],
   breath:['التنفس','Breathing'], mistakes:['أخطاء شائعة','Common mistakes'], safety:['السلامة','Safety'],
   diagram:['مخطط توضيحي مبسّط وليس صورة واقعية','Simplified diagram, not a realistic image'],
@@ -36,3 +41,6 @@ export const POSE: Record<string, [string, string][]> = {
   raise:[['زفير أثناء الرفع وشهيق أثناء النزول.','Exhale as you raise, inhale as you lower.'],['رفع الذراعين فوق مستوى الكتفين|وزن ثقيل مع تأرجح','Raising above shoulder height|Heavy weight with swinging'],['ارفع حتى مستوى الكتف فقط وبوزن خفيف.','Raise only to shoulder height, using light weight.']],
   plank:[['تنفس بانتظام ولا تحبس النفس.','Breathe steadily; do not hold your breath.'],['ارتفاع الورك أو هبوطه|حبس النفس','Hips rising or dropping|Holding your breath'],['توقف عند ألم أسفل الظهر وقصّر مدة التثبيت.','Stop at lower-back pain and shorten the hold.']],
 };
+
+Object.assign(META, EXTRA_META);
+export const TIPS = EXTRA_TIPS;

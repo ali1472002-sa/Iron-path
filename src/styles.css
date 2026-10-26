@@ -25,3 +25,26 @@ select,textarea{min-height:44px;border-radius:12px;border:1px solid var(--mut);p
 ol{padding-inline-start:20px;line-height:1.7}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filters select{min-width:0}
 ul.plain li{border:0;padding:2px 0}h3{margin:8px 0 0;font-size:1.05rem}
+nav button{font-size:.78rem;padding:0 2px}
+.timer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:#8881;border-radius:12px;padding:10px}
+.timer.flash{background:#16a34a55}
+.ent{border-top:1px solid #8883;padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.srow{align-items:center;gap:6px}.srow input{min-width:0;width:100%}.srow button{padding:0 8px}
+.sug{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#f59e0b22;border-radius:12px;padding:8px}.sug span{flex:1 1 100%}
+nav button:not(.on) span{display:none}
+.srow{flex-wrap:wrap}.ent select{min-width:0;max-width:100%}
+.bar{height:8px;background:#8883;border-radius:6px;overflow:hidden;margin:4px 0}.bar>i{display:block;height:100%;background:var(--acc)}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem}input[type=date]{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#8881;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;font-size:.85rem}.stat b{font-size:1.15rem}
+nav button{min-width:0}
+@keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+.pop{animation:pop .5s ease-out}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}}
+input[type=time]{min-width:0}
+html,body{overflow-x:hidden;-webkit-text-size-adjust:100%}button,select,input{touch-action:manipulation}
+.app{padding-inline:env(safe-area-inset-left) env(safe-area-inset-right)}
+:root{--mut:#4b5563}[data-theme=dark]{--mut:#9ca3af;color-scheme:dark}[data-theme=light]{color-scheme:light}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.setcard{border:1px solid #8884;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}.setcard.done{background:#16a34a22;border-color:#16a34a}
+.stepper{display:flex;align-items:center;gap:6px}.stepper input{width:64px;text-align:center;min-height:48px;font-size:1.15rem}.stepper small{color:var(--mut)}
+button.big{min-height:52px;min-width:52px;font-size:1.15rem}

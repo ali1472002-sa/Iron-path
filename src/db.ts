@@ -34,20 +34,6 @@ export async function exportAll(): Promise<string> {
   for (const s of STORES) data[s] = await getAll(s);
   return JSON.stringify({ app: 'ironpath', version: DB_VERSION, exportedAt: new Date().toISOString(), data }, null, 2);
 }
-export async function importAll(text: string): Promise<number> {
-  let obj: any;
-  try { obj = JSON.parse(text); } catch { throw new Error('invalid-json'); }
-  if (!obj || obj.app !== 'ironpath' || typeof obj.version !== 'number' || obj.version > DB_VERSION || typeof obj.data !== 'object' || !obj.data)
-    throw new Error('invalid-format');
-  for (const s of STORES) {
-    const rows = obj.data[s] ?? [];
-    if (!Array.isArray(rows) || rows.some((x) => !x || typeof x !== 'object' || typeof x.id !== 'string'))
-      throw new Error('invalid-' + s);
-  }
-  await clearAll();
-  let n = 0;
-  for (const s of STORES) for (const row of obj.data[s] ?? []) { await put(s, row); n++; }
-  return n;
-}
+// Restore lives in backup.ts (validation, preview) + backupStore.ts (atomic transaction). The old importAll() was removed: it wiped data before writing and was not atomic.
 export const measurementsCsv = (rows: { date: string; weightKg: number }[]) =>
   'date,weight_kg\n' + rows.map((r) => `${r.date},${r.weightKg}`).join('\n');
