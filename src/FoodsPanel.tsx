@@ -3,6 +3,7 @@ import { Lang } from './i18n';
 import { CATS, FoodRec, RECIPES } from './foodDb';
 import { fromFdc, normText, reconcile, Report } from './refdata';
 import * as db from './db';
+import { I } from './Icon';
 
 const F: Record<string, [string, string]> = {
   search:['ابحث بالعربية أو الإنجليزية…','Search in Arabic or English…'], all:['الكل','All'], mine:['أطعمتي','Mine'], imp:['مستورد','Imported'], more:['عرض المزيد','Show more'],
@@ -75,8 +76,8 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
           <div key={x.id} className="row srow"><span style={{ flex: 1 }}><b>{x.name}</b><br />
             <span className="muted">{Math.round(x.per.k)} {f('kcal')} · P{+x.per.p.toFixed(1)} C{+x.per.c.toFixed(1)} F{+x.per.f.toFixed(1)} · {f('fiber')} {x.per.fi == null ? f('na') : +x.per.fi.toFixed(1)} / 100 g<br />
               {f(x.status)} · {x.srcLabel}{x.prep ? ' · ' + x.prep : ''}</span></span>
-            {raw && !raw.ref && <button className="ghost" onClick={() => setCf({ id: raw.id, rec: raw, name: raw.name, cat: raw.cat ?? 'other', k: raw.per.k, p: raw.per.p, c: raw.per.c, f: raw.per.f, fi: raw.per.fi ?? '', g: raw.g })}>✏️</button>}
-            {raw && <button className="ghost" onClick={() => confirm(f('confDel')) && run(() => db.remove('nutrition', raw.id))}>🗑️</button>}
+            {raw && !raw.ref && <button className="ghost" onClick={() => setCf({ id: raw.id, rec: raw, name: raw.name, cat: raw.cat ?? 'other', k: raw.per.k, p: raw.per.p, c: raw.per.c, f: raw.per.f, fi: raw.per.fi ?? '', g: raw.g })}><I n="edit" /></button>}
+            {raw && <button className="ghost" onClick={() => confirm(f('confDel')) && run(() => db.remove('nutrition', raw.id))}><I n="trash" /></button>}
           </div>);
       })}
       {list.length > shown && <button className="ghost" onClick={() => setShown(shown + 40)}>{f('more')} ({list.length - shown})</button>}
@@ -86,23 +87,23 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
           <select value={cf.cat} onChange={(e) => setCf({ ...cf, cat: e.target.value })}>{Object.keys(CATS).map((k) => <option key={k} value={k}>{CATS[k][i]}</option>)}</select>
           <span className="muted">{f('per100')}</span>
           {(['k', 'p', 'c', 'f', 'fi', 'g'] as const).map((k) => <label key={k}>{k === 'g' ? f('serv') : f(k === 'k' ? 'kcal' : k)}<input inputMode="decimal" value={cf[k]} onChange={(e) => setCf({ ...cf, [k]: e.target.value })} /></label>)}
-          <button onClick={saveCf}>💾 {f('save')}</button><button className="ghost" onClick={() => setCf(null)}>✕</button></div>
-      ) : <button onClick={() => setCf({ name: '', cat: 'other', k: '', p: '', c: '', f: '', fi: '', g: '100' })}>➕ {f('newFood')}</button>}
+          <button className="primary" onClick={saveCf}><I n="save" /> {f('save')}</button><button className="ghost" onClick={() => setCf(null)}><I n="x" /></button></div>
+      ) : <button onClick={() => setCf({ name: '', cat: 'other', k: '', p: '', c: '', f: '', fi: '', g: '100' })}><I n="plus" /> {f('newFood')}</button>}
 
       {rc ? (
-        <div className="ent"><b>🍲 {f('recipe')}</b>
+        <div className="ent"><b><I n="pot" /> {f('recipe')}</b>
           <input placeholder={f('name')} value={rc.name} onChange={(e) => setRc({ ...rc, name: e.target.value })} />
           {rc.ings.map((x: any, k: number) => (
             <div key={k} className="row srow"><span style={{ flex: 1 }}>{byId(x.id)?.name}</span>
               <input style={{ maxWidth: 80 }} inputMode="decimal" value={x.g} onChange={(e) => setRc({ ...rc, ings: rc.ings.map((y: any, j: number) => (j === k ? { ...y, g: +e.target.value || 0 } : y)) })} />
-              <button className="ghost" onClick={() => setRc({ ...rc, ings: rc.ings.filter((_: any, j: number) => j !== k) })}>✕</button></div>))}
+              <button className="ghost" onClick={() => setRc({ ...rc, ings: rc.ings.filter((_: any, j: number) => j !== k) })}><I n="x" /></button></div>))}
           <select value={pick} onChange={(e) => { const fd = byId(e.target.value); if (fd) setRc({ ...rc, ings: [...rc.ings, { id: fd.id, g: fd.g }] }); setPick(''); }}>
-            <option value="">➕ {f('ing')}</option>{foods.slice(0, 400).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
+            <option value=""><I n="plus" /> {f('ing')}</option>{foods.slice(0, 400).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
           <label>{f('final')}<input inputMode="decimal" value={rc.final} onChange={(e) => setRc({ ...rc, final: e.target.value })} /></label>
           <label>{f('servings')}<input inputMode="numeric" value={rc.servings} onChange={(e) => setRc({ ...rc, servings: e.target.value })} /></label>
           {rc.ings.length > 0 && (() => { const t = rcTotals(rc.ings, +rc.final || 0); return <p className="muted">{Math.round(t.per.k)} {f('kcal')} · P{Math.round(t.per.p)} C{Math.round(t.per.c)} F{Math.round(t.per.f)} / 100 g</p>; })()}
-          <button onClick={() => saveRecipe(rc.name, rc.ings, +rc.final || 0, +rc.servings || 1)}>💾 {f('save')}</button><button className="ghost" onClick={() => setRc(null)}>✕</button></div>
-      ) : <button className="ghost" onClick={() => setRc({ name: '', ings: [], final: '', servings: '1' })}>🍲 {f('recipe')}</button>}
+          <button className="primary" onClick={() => saveRecipe(rc.name, rc.ings, +rc.final || 0, +rc.servings || 1)}><I n="save" /> {f('save')}</button><button className="ghost" onClick={() => setRc(null)}><I n="x" /></button></div>
+      ) : <button className="ghost" onClick={() => setRc({ name: '', ings: [], final: '', servings: '1' })}><I n="pot" /> {f('recipe')}</button>}
 
       <div className="ent"><b>{f('tpl')}</b>
         {RECIPES.map((r) => (
@@ -110,15 +111,15 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
             <button className="ghost" onClick={() => setRc({ name: r[1 + i], ings: r[3].map(([id, g]) => ({ id, g })), final: '', servings: '1' })}>{f('addTpl')}</button></div>))}
       </div>
 
-      <div className="ent"><b>⬇️ {f('imp1')}</b><span className="muted">{f('impHelp')}</span>
+      <div className="ent"><b><I n="download" s={16} /> {f('imp1')}</b><span className="muted">{f('impHelp')}</span>
         <input type="file" accept="application/json,.json" disabled={busy} onChange={(e) => onFile(e.target.files?.[0])} />
-        {busy && <span className="muted">⏳</span>}
-        {rep && <p>📋 {f('rep')}: {rep.imported} {f('imported')} · {rep.updated} {f('updated')} · {rep.skipped} {f('skipped')} · {rep.rejected} {f('rejected')} · {rep.nearDup} {f('nearDup')}
+        {busy && <span className="muted"><I n="hourglass" /></span>}
+        {rep && <p><I n="clip" /> {f('rep')}: {rep.imported} {f('imported')} · {rep.updated} {f('updated')} · {rep.skipped} {f('skipped')} · {rep.rejected} {f('rejected')} · {rep.nearDup} {f('nearDup')}
           {Object.keys(rep.reasons).length > 0 && <><br /><span className="muted">{Object.entries(rep.reasons).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span></>}<br /><span className="muted">{f('attr')}</span></p>}
-        {customs.some((c) => c.ref) && <button className="ghost" onClick={() => confirm(f('confDel')) && run(async () => { for (const c of customs.filter((x) => x.ref)) await db.remove('nutrition', c.id); })}>🗑️ {f('delImp')} ({customs.filter((c) => c.ref).length})</button>}
+        {customs.some((c) => c.ref) && <button className="ghost" onClick={() => confirm(f('confDel')) && run(async () => { for (const c of customs.filter((x) => x.ref)) await db.remove('nutrition', c.id); })}><I n="trash" /> {f('delImp')} ({customs.filter((c) => c.ref).length})</button>}
       </div>
       <p className="muted">{f('barcode')}</p>
-      {meals.length > 0 && <><h3>{f('saved')}</h3>{meals.map((m) => <div key={m.id} className="row srow"><span style={{ flex: 1 }}>{m.name}</span><button className="ghost" onClick={() => confirm(f('confDel')) && run(() => db.remove('nutrition', m.id))}>🗑️</button></div>)}</>}
+      {meals.length > 0 && <><h3>{f('saved')}</h3>{meals.map((m) => <div key={m.id} className="row srow"><span style={{ flex: 1 }}>{m.name}</span><button className="ghost" onClick={() => confirm(f('confDel')) && run(() => db.remove('nutrition', m.id))}><I n="trash" /></button></div>)}</>}
     </section>
   );
 }

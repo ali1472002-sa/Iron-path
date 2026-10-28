@@ -3,6 +3,7 @@ import { Lang, t } from './i18n';
 import { EXERCISES, MUSCLES } from './exercises';
 import { DEFAULT, Day, Plan, Profile, alts, generate } from './planGen';
 import * as db from './db';
+import { I } from './Icon';
 
 const P: Record<string, [string, string]> = {
   week:['الأسبوع','Week'], plans:['خططي','My plans'], newPlan:['إنشاء خطة','Create plan'], load:['جارٍ التحميل…','Loading…'], err:['خطأ: ','Error: '],
@@ -11,12 +12,12 @@ const P: Record<string, [string, string]> = {
   equip:['المعدات','Equipment'], split:['نظام التقسيم (اختياري)','Split (optional)'], prio:['عضلات تريد التركيز عليها (اختياري)','Priority muscles (optional)'],
   avoid:['تمارين تتجنبها أو تسبب لك ألماً (اختياري)','Exercises to avoid or that cause pain (optional)'],
   gen:['توليد الخطة','Generate plan'], regen:['إعادة التوليد','Regenerate'], save:['حفظ','Save'], saveCopy:['حفظ كخطة جديدة','Save as new plan'], back:['رجوع','Back'],
-  name:['اسم الخطة','Plan name'], nameReq:['أدخل اسماً للخطة','Enter a plan name'], activate:['تفعيل','Activate'], active:['مفعّلة ✔','Active ✔'], dup:['نسخ','Duplicate'], del:['حذف','Delete'], edit:['فتح وتعديل','Open & edit'],
+  name:['اسم الخطة','Plan name'], nameReq:['أدخل اسماً للخطة','Enter a plan name'], activate:['تفعيل','Activate'], active:['مفعّلة ','Active '], dup:['نسخ','Duplicate'], del:['حذف','Delete'], edit:['فتح وتعديل','Open & edit'],
   confirmDel:['حذف هذه الخطة؟ سجل تمارينك المكتمل لن يُحذف.','Delete this plan? Your completed workout history is kept.'],
   confirmSave:['سيتم استبدال التعديلات على هذه الخطة. متابعة؟','This will overwrite the saved plan. Continue?'],
   confirmReg:['سيُنشأ مقترح جديد ولن تتغير خطتك المحفوظة إلا إذا حفظته كخطة جديدة.','A new proposal is created; your saved plan stays unchanged unless you save it as new.'],
-  sets:['مجموعات','sets'], rest:['راحة','rest'], swap:['استبدال','Swap'], rm:['حذف','Remove'], restDay:['😴 راحة','😴 Rest'], start:['ابدأ','Start'], toToday:['انقل لليوم','Move to today'],
-  done:['✅ تم','✅ Done'], missed:['⚠️ فائت','⚠️ Missed'], thisWeek:['هذا الأسبوع','This week'], lastWeek:['الأسبوع الماضي','Last week'], planned:['مخطط','planned'], completed:['مكتمل','completed'],
+  sets:['مجموعات','sets'], rest:['راحة','rest'], swap:['استبدال','Swap'], rm:['حذف','Remove'], restDay:['راحة','Rest'], start:['ابدأ','Start'], toToday:['انقل لليوم','Move to today'],
+  done:['تم','Done'], missed:['فائت','Missed'], thisWeek:['هذا الأسبوع','This week'], lastWeek:['الأسبوع الماضي','Last week'], planned:['مخطط','planned'], completed:['مكتمل','completed'],
   prog:['التدرّج: عند إكمال كل المجموعات بأعلى تكرار في النطاق، يقترح التطبيق زيادة صغيرة (2.5 كغم) وتقبلها أو تتجاهلها أنت. لا تُقترح زيادة بعد انخفاض الأداء أو تسجيل ألم. لا تتمرّن رغم الألم، وخفّف الحمل أو استبدل التمرين.',
         'Progression: when you complete every set at the top of the rep range, the app suggests a small increase (2.5 kg) that you can accept or dismiss. No increase is suggested after a performance drop or a pain note. Never train through pain; reduce load or swap the exercise.'],
   disc:['إرشاد لياقة عام وليس تشخيصاً أو علاجاً طبياً. استشر مختصاً عند وجود مرض أو إصابة.','General fitness guidance, not medical diagnosis or treatment. See a professional if you have an illness or injury.'],
@@ -90,10 +91,10 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
   const dup = (pl: Plan) => run(() => db.put('plans', { ...pl, id: 'plan:' + crypto.randomUUID(), name: pl.name + ' (2)', createdAt: new Date().toISOString() }));
   const del = (pl: Plan) => { if (confirm(p('confirmDel'))) run(async () => { await db.remove('plans', pl.id); if (active === pl.id) await db.remove('plans', 'activePlan'); }); };
 
-  if (!ready) return <section className="card"><p className="muted">⏳ {p('load')}</p></section>;
+  if (!ready) return <section className="card"><p className="muted"><I n="hourglass" /> {p('load')}</p></section>;
   const tabs = (
     <div className="chips">
-      {(['week', 'plans'] as const).map((v) => <button key={v} className={'chip' + (view === v ? ' on' : '')} onClick={() => { setView(v); setMsg(''); }}>{v === 'week' ? '📅' : '🗂️'} {p(v)}</button>)}
+      {(['week', 'plans'] as const).map((v) => <button key={v} className={'chip' + (view === v ? ' on' : '')} onClick={() => { setView(v); setMsg(''); }}>{v === 'week' ? <I n="cal" /> : <I n="layers" />} {p(v)}</button>)}
     </div>
   );
   const err = msg && <p className="warn">{msg}</p>;
@@ -109,13 +110,13 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
     return (
       <section className="card">
         <button className="ghost" onClick={() => setView('plans')}>{lang === 'ar' ? '→' : '←'} {p('back')}</button>
-        <h2>🧭 {p('newPlan')}</h2>
+        <h2><I n="compass" /> {p('newPlan')}</h2>
         {sel('goal', 'goal')}{sel('level', 'level')}{num('days', [2, 3, 4, 5, 6])}{num('dur', [30, 45, 60, 90])}{sel('equip', 'equip')}{sel('split', 'split')}
         <div><b>{p('prio')}</b><div className="chips">{MUSCLES.map((m) => <button key={m} className={'chip' + (prof.prio.includes(m) ? ' on' : '')} onClick={() => tog('prio', m)}>{T(m)}</button>)}</div></div>
         <div><b>{p('avoid')}</b><div className="chips" style={{ flexWrap: 'wrap' }}>{(EXERCISES as any[]).map((e) => <button key={e.id} className={'chip' + (prof.avoid.includes(e.id) ? ' on' : '')} onClick={() => tog('avoid', e.id)}>{e[lang]}</button>)}</div></div>
-        <p className="muted">⚠️ {p('disc')}</p>
+        <p className="muted"><I n="warn" /> {p('disc')}</p>
         {err}
-        <button onClick={generateNow}>✨ {p('gen')}</button>
+        <button onClick={generateNow}><I n="sparkle" /> {p('gen')}</button>
       </section>
     );
   }
@@ -136,23 +137,23 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
                 <div className="row">
                   <button className="ghost" onClick={() => upd((c) => { const x = c.days.find((y) => y.id === d.id)!.items[k]; x.sets = Math.max(1, x.sets - 1); })}>−</button>
                   <button className="ghost" onClick={() => upd((c) => { c.days.find((y) => y.id === d.id)!.items[k].sets++; })}>+</button>
-                  <button className="ghost" disabled={k === 0} onClick={() => upd((c) => { const a = c.days.find((y) => y.id === d.id)!.items; [a[k - 1], a[k]] = [a[k], a[k - 1]]; })}>▲</button>
-                  <button className="ghost" disabled={k === d.items.length - 1} onClick={() => upd((c) => { const a = c.days.find((y) => y.id === d.id)!.items; [a[k + 1], a[k]] = [a[k], a[k + 1]]; })}>▼</button>
-                  <button className="ghost" onClick={() => upd((c) => { c.days.find((y) => y.id === d.id)!.items.splice(k, 1); })}>✕</button>
+                  <button className="ghost" disabled={k === 0} onClick={() => upd((c) => { const a = c.days.find((y) => y.id === d.id)!.items; [a[k - 1], a[k]] = [a[k], a[k - 1]]; })} aria-label="up"><I n="chevu" s={18} /></button>
+                  <button className="ghost" disabled={k === d.items.length - 1} onClick={() => upd((c) => { const a = c.days.find((y) => y.id === d.id)!.items; [a[k + 1], a[k]] = [a[k], a[k + 1]]; })} aria-label="down"><I n="chevd" s={18} /></button>
+                  <button className="ghost" onClick={() => upd((c) => { c.days.find((y) => y.id === d.id)!.items.splice(k, 1); })}><I n="x" /></button>
                 </div>
                 {alts(it.exId, cur.profile).length > 0 && (
                   <select value="" onChange={(e) => e.target.value && upd((c) => { const x = c.days.find((y) => y.id === d.id)!.items; x[k] = { ...x[k], exId: e.target.value }; })}>
-                    <option value="">🔄 {p('swap')}</option>{alts(it.exId, cur.profile).map((id) => <option key={id} value={id}>{exn(id)}</option>)}
+                    <option value=""><I n="refresh" /> {p('swap')}</option>{alts(it.exId, cur.profile).map((id) => <option key={id} value={id}>{exn(id)}</option>)}
                   </select>)}
               </div>
             ))}
           </div>
         ))}
-        <p className="muted">📈 {p('prog')}</p><p className="muted">⚠️ {p('disc')}</p>
+        <p className="muted"><I n="trend" /> {p('prog')}</p><p className="muted"><I n="warn" /> {p('disc')}</p>
         {err}
-        <button onClick={() => saveCur(false)}>💾 {isNew ? p('save') : p('save')}</button>
+        <button className="primary" onClick={() => saveCur(false)}><I n="save" /> {isNew ? p('save') : p('save')}</button>
         {!isNew && <button className="ghost" onClick={() => saveCur(true)}>{p('saveCopy')}</button>}
-        <button className="ghost" onClick={() => { if (isNew || confirm(p('confirmReg'))) { setProf(cur.profile); setView('wizard'); } }}>🔁 {p('regen')}</button>
+        <button className="ghost" onClick={() => { if (isNew || confirm(p('confirmReg'))) { setProf(cur.profile); setView('wizard'); } }}><I n="repeat" /> {p('regen')}</button>
       </section>
     );
   }
@@ -160,22 +161,22 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
   if (view === 'plans') return (
     <section className="card">
       {tabs}
-      <button onClick={() => setView('wizard')}>➕ {p('newPlan')}</button>
+      <button onClick={() => setView('wizard')}><I n="plus" /> {p('newPlan')}</button>
       {err}
       {plans.length === 0 && <p className="muted">{p('noPlans')}</p>}
       {plans.map((pl) => (
         <div key={pl.id} className="ent">
-          <b>{pl.name} {active === pl.id ? '✔' : ''}</b>
+          <b>{pl.name} {active === pl.id ? <I n="check" /> : ''}</b>
           <span className="muted">{opt('goal', pl.profile.goal)} · {opt('level', pl.profile.level)} · {pl.days.length}×/{p('week')}</span>
           <div className="row" style={{ flexWrap: 'wrap' }}>
-            <button className="ghost" onClick={() => { setCur(pl); setIsNew(false); setView('edit'); }}>✏️ {p('edit')}</button>
+            <button className="ghost" onClick={() => { setCur(pl); setIsNew(false); setView('edit'); }}><I n="edit" /> {p('edit')}</button>
             <button className="ghost" disabled={active === pl.id} onClick={() => activate(pl.id)}>{active === pl.id ? p('active') : p('activate')}</button>
-            <button className="ghost" onClick={() => dup(pl)}>📄 {p('dup')}</button>
-            <button className="ghost" onClick={() => del(pl)}>🗑️ {p('del')}</button>
+            <button className="ghost" onClick={() => dup(pl)}><I n="file" /> {p('dup')}</button>
+            <button className="ghost" onClick={() => del(pl)}><I n="trash" /> {p('del')}</button>
           </div>
         </div>
       ))}
-      <p className="muted">⚠️ {p('disc')}</p>
+      <p className="muted"><I n="warn" /> {p('disc')}</p>
     </section>
   );
 
@@ -191,7 +192,7 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
       {!act ? <p className="muted">{p('noActive')}</p> : (
         <>
           <h2>{act.name}</h2>
-          <p className="muted">📊 {p('thisWeek')}: {done0.size}/{act.days.length} · {p('lastWeek')}: {done1.size}/{act.days.length} ({p('completed')}/{p('planned')})</p>
+          <p className="muted"><I n="chart" /> {p('thisWeek')}: {done0.size}/{act.days.length} · {p('lastWeek')}: {done1.size}/{act.days.length} ({p('completed')}/{p('planned')})</p>
           {ORDER.map((wd, k) => {
             const d = act.days.find((x) => x.weekday === wd);
             const isToday = wk[k] === ld(today), past = wk[k] < ld(today);
@@ -203,8 +204,8 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
                 {d && <>
                   <span className="muted">{d.name[i]} · {d.items.length}</span>
                   <div className="row" style={{ flexWrap: 'wrap' }}>
-                    {!ok && <button onClick={() => onStart(d, act.id)}>▶️ {p('start')}</button>}
-                    {!ok && past && <button className="ghost" onClick={() => moveDay(act, d.id, today.getDay())}>↪ {p('toToday')}</button>}
+                    {!ok && <button onClick={() => onStart(d, act.id)}><I n="play" /> {p('start')}</button>}
+                    {!ok && past && <button className="ghost" onClick={() => moveDay(act, d.id, today.getDay())}><I n="arrow" /> {p('toToday')}</button>}
                     <select value={wd} onChange={(e) => moveDay(act, d.id, +e.target.value)}>{ORDER.map((w) => <option key={w} value={w}>{wdn(w)}</option>)}</select>
                   </div></>}
               </div>
@@ -212,7 +213,7 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
           })}
         </>
       )}
-      <p className="muted">⚠️ {p('disc')}</p>
+      <p className="muted"><I n="warn" /> {p('disc')}</p>
     </section>
   );
 }

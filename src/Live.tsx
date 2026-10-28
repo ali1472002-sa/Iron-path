@@ -5,12 +5,13 @@ import { META } from './exerciseMeta';
 import ExerciseMedia from './ExerciseMedia';
 import * as L from './liveLogic';
 import * as db from './db';
+import { I } from './Icon';
 
 const V: Record<string, [string, string]> = {
   ex:['تمرين','Exercise'], sets:['مجموعات','Sets'], plan:['المخطط','Planned'], actual:['الفعلي','Actual'], reps:['تكرار','reps'], kg:['كغم','kg'], rest:['راحة','Rest'],
-  restDone:['انتهت الراحة ✅','Rest over ✅'], next:['التالي','Next'], none:['— آخر تمرين —','— last exercise —'], skipEx:['تخطي التمرين','Skip exercise'], skipped:['تم تخطيه','Skipped'],
+  restDone:['انتهت الراحة ','Rest over '], next:['التالي','Next'], none:['— آخر تمرين —','— last exercise —'], skipEx:['تخطي التمرين','Skip exercise'], skipped:['تم تخطيه','Skipped'],
   unskip:['إلغاء التخطي','Undo skip'], addSet:['+ مجموعة','+ Set'], delSet:['− مجموعة','− Set'], done:['تم','Done'], undo:['تعديل','Edit'], rpe:['جهد (اختياري)','RPE (optional)'],
-  note:['ملاحظة','Note'], warm:['إحماء','Warm-up'], pain:['🤕 ألم','🤕 Pain'], pause:['إيقاف مؤقت','Pause'], resume:['متابعة','Resume'], paused:['الجلسة متوقفة مؤقتاً','Session paused'],
+  note:['ملاحظة','Note'], warm:['إحماء','Warm-up'], pain:['ألم','Pain'], pause:['إيقاف مؤقت','Pause'], resume:['متابعة','Resume'], paused:['الجلسة متوقفة مؤقتاً','Session paused'],
   finish:['إنهاء وحفظ','Finish & save'], abandon:['التخلي عن الجلسة','Abandon session'], confAb:['التخلي عن هذه الجلسة؟ ستُحذف المجموعات غير المحفوظة نهائياً.','Abandon this session? Unsaved sets are deleted permanently.'],
   auto:['بدء الراحة تلقائياً','Auto-start rest'], media:['الرسم التوضيحي','Illustration'], prev:['آخر مرة','Last time'], planned:['مخطط','plan'],
   sug:['اقتراح (ليس رقماً قياسياً)','Suggestion (not a record)'], up:['زيادة الحمل إلى','increase load to'], keep:['ثبّت الحمل عند','stay at'], more:['حاول زيادة تكرار','try one more rep'],
@@ -28,13 +29,13 @@ export function SummaryCard({ lang, s, nm, onClose }: { lang: Lang; s: any; nm: 
   const i = lang === 'ar' ? 0 : 1, v = (k: string) => V[k][i];
   return (
     <section className="card pop">
-      <h2>🏁 {v('sumT')}</h2>
+      <h2><I n="flag" /> {v('sumT')}</h2>
       <div className="grid2">
-        <div className="stat">⏱️ {v('dur')}<b>{hms(s.durationSec)}</b></div><div className="stat">💪 {v('exs')}<b>{s.exercises}</b></div>
-        <div className="stat">✅ {v('st')}<b>{s.sets}</b></div><div className="stat">🔁 {v('rp')}<b>{s.reps}</b></div>
-        <div className="stat">📦 {v('vol')}<b>{s.volume ?? '—'}</b>{s.volume == null && <span className="muted">{v('noLoad')}</span>}</div><div className="stat">⏭️ {v('sk')}<b>{s.skipped}</b></div>
+        <div className="stat"><I n="timer" /> {v('dur')}<b>{hms(s.durationSec)}</b></div><div className="stat"><I n="dumbbell" /> {v('exs')}<b>{s.exercises}</b></div>
+        <div className="stat"><I n="checkc" /> {v('st')}<b>{s.sets}</b></div><div className="stat"><I n="repeat" /> {v('rp')}<b>{s.reps}</b></div>
+        <div className="stat"><I n="pkg" /> {v('vol')}<b>{s.volume ?? '—'}</b>{s.volume == null && <span className="muted">{v('noLoad')}</span>}</div><div className="stat"><I n="skip" /> {v('sk')}<b>{s.skipped}</b></div>
       </div>
-      {s.prs.map((id: string) => <p key={id}>🏆 {nm(id)} — {v('pr')}</p>)}
+      {s.prs.map((id: string) => <p key={id}><I n="trophy" /> {nm(id)} — {v('pr')}</p>)}
       <button onClick={onClose}>{v('close')}</button>
     </section>
   );
@@ -75,65 +76,65 @@ export default function Live({ lang, draft, save, hist, suggest, nm, cust, onFin
     try { if (session.entries.length) await db.put('workouts', session); await db.remove('workouts', 'draft'); onFinish(summary); } catch { fin.current = false; }
   };
   const addEx = (id: string) => { if (!id) return; mut((c) => { c.entries.push({ exId: id, plan: { sets: 3, repMin: 10, repMax: 10, rest: 90 }, sets: Array.from({ length: 3 }, () => ({ kg: '', reps: '10', pr: '10', done: false })) }); c.cur = c.entries.length - 1; }); setPick(''); };
-  if (!e) return <section className="card"><button onClick={() => onAbandon()}>{v('abandon')}</button><select value={pick} onChange={(ev) => addEx(ev.target.value)}><option value="">➕ {v('addEx')}</option>{(EXERCISES as any[]).map((x) => <option key={x.id} value={x.id}>{x[lang]}</option>)}</select></section>;
+  if (!e) return <section className="card"><button onClick={() => onAbandon()}>{v('abandon')}</button><select value={pick} onChange={(ev) => addEx(ev.target.value)}><option value=""><I n="plus" /> {v('addEx')}</option>{(EXERCISES as any[]).map((x) => <option key={x.id} value={x.id}>{x[lang]}</option>)}</select></section>;
   const ps = d.pausedAt != null;
   return (
     <section className="card" aria-live="polite">
       <div className="row" style={{ alignItems: 'center' }}>
-        <b style={{ flex: 1 }}>🔥 {v('ex')} {cur + 1}/{d.entries.length} · {v('sets')} {done}/{total}</b>
-        <span>⏱️ {hms(el)}</span>
+        <b style={{ flex: 1 }}><I n="flame" /> {v('ex')} {cur + 1}/{d.entries.length} · {v('sets')} {done}/{total}</b>
+        <span><I n="timer" /> {hms(el)}</span>
       </div>
       <div className="bar"><i style={{ width: (total ? (done / total) * 100 : 0) + '%' }} /></div>
-      {ps && <p className="warn">⏸️ {v('paused')} <button onClick={() => save(L.resumeSession(d, Date.now()))}>▶ {v('resume')}</button></p>}
-      {!ps && <button className="ghost" onClick={() => save(L.pauseSession(d, Date.now()))}>⏸ {v('pause')}</button>}
+      {ps && <p className="warn"><I n="pause" /> {v('paused')} <button onClick={() => save(L.resumeSession(d, Date.now()))}><I n="play" /> {v('resume')}</button></p>}
+      {!ps && <button className="ghost" onClick={() => save(L.pauseSession(d, Date.now()))}><I n="pause" /> {v('pause')}</button>}
       {r && (
         <div className={'timer' + (r.done ? ' flash' : '')}>
-          <b style={{ fontSize: '1.6rem' }}>⏱️ {r.done ? v('restDone') : mmss(left)}</b>
+          <b style={{ fontSize: '1.6rem' }}><I n="timer" /> {r.done ? v('restDone') : mmss(left)}</b>
           <span className="row" style={{ flexWrap: 'wrap' }}>
-            {!r.done && (r.left != null ? <button className="chip" onClick={() => save(L.resumeRest(d, Date.now()))}>▶ {v('resume')}</button> : <button className="chip" onClick={() => save(L.pauseRest(d, Date.now()))}>⏸ {v('pause')}</button>)}
+            {!r.done && (r.left != null ? <button className="chip" onClick={() => save(L.resumeRest(d, Date.now()))}><I n="play" /> {v('resume')}</button> : <button className="chip" onClick={() => save(L.pauseRest(d, Date.now()))}><I n="pause" /> {v('pause')}</button>)}
             <button className="chip" onClick={() => save(L.addRest(d, 15, Date.now()))}>+15s</button>
-            <button className="chip" onClick={() => save(L.skipRest(d))}>⏭ {r.done ? v('close') : v('rest') + ' ✕'}</button>
+            <button className="chip" onClick={() => save(L.skipRest(d))}><I n="skip" /> {r.done ? v('close') : v('rest') + ' '}</button>
           </span>
         </div>)}
       <div className="ent">
         <b style={{ fontSize: '1.15rem' }}>{name(e.exId)}</b>
         {e.plan && <span className="muted">{v('plan')}: {e.plan.sets} × {e.plan.repMin}–{e.plan.repMax} · {v('rest')} {e.plan.rest}s{e.sets[0]?.pk ? ` · ${e.sets[0].pk} ${v('kg')} (${v('planned')})` : ''}</span>}
-        <button className="ghost" onClick={() => setShowMedia(!showMedia)}>🖼️ {v('media')}</button>
+        <button className="ghost" onClick={() => setShowMedia(!showMedia)}><I n="image" /> {v('media')}</button>
         {showMedia && <ExerciseMedia exId={e.exId} lang={lang} primary={meta ? [meta[0]] : []} secondary={meta ? meta[1].split(',').filter(Boolean) : []} />}
-        {prevE && <p className="muted">🕘 {v('prev')} ({A_day(prevE.date)}): {prevE.e.sets.map((s: any) => `${s.reps}×${s.kg || 0}`).join(' · ')}</p>}
+        {prevE && <p className="muted"><I n="clock" /> {v('prev')} ({A_day(prevE.date)}): {prevE.e.sets.map((s: any) => `${s.reps}×${s.kg || 0}`).join(' · ')}</p>}
         {sg && !dis.includes(e.exId) && (
-          <div className="sug"><span>💡 {v('sug')}: {sg.k === 'up' ? `${v('up')} ${sg.kg} ${v('kg')}` : sg.k === 'keep' ? `${v('keep')} ${sg.kg} ${v('kg')}` : sg.k === 'more' ? v('more') : sg.k === 'pain' ? v('painS') : v('hold')}</span>
-            {(sg.k === 'up' || sg.k === 'more') && <button onClick={() => { mut((c) => c.entries[cur].sets.forEach((s: any) => { if (!s.done) { if (sg.k === 'up') s.kg = String(sg.kg); else s.reps = String((+s.reps || 0) + 1); } })); setDis([...dis, e.exId]); }}>✔ {v('accept')}</button>}
-            <button className="ghost" onClick={() => setDis([...dis, e.exId])}>✕ {v('dismiss')}</button></div>)}
-        {e.skipped ? <p className="warn">⏭️ {v('skipped')} <button className="ghost" onClick={() => mut((c) => { c.entries[cur].skipped = false; })}>{v('unskip')}</button></p> : e.sets.map((s: any, si: number) => (
+          <div className="sug"><span><I n="bulb" /> {v('sug')}: {sg.k === 'up' ? `${v('up')} ${sg.kg} ${v('kg')}` : sg.k === 'keep' ? `${v('keep')} ${sg.kg} ${v('kg')}` : sg.k === 'more' ? v('more') : sg.k === 'pain' ? v('painS') : v('hold')}</span>
+            {(sg.k === 'up' || sg.k === 'more') && <button onClick={() => { mut((c) => c.entries[cur].sets.forEach((s: any) => { if (!s.done) { if (sg.k === 'up') s.kg = String(sg.kg); else s.reps = String((+s.reps || 0) + 1); } })); setDis([...dis, e.exId]); }}><I n="check" /> {v('accept')}</button>}
+            <button className="ghost" onClick={() => setDis([...dis, e.exId])}><I n="x" /> {v('dismiss')}</button></div>)}
+        {e.skipped ? <p className="warn"><I n="skip" /> {v('skipped')} <button className="ghost" onClick={() => mut((c) => { c.entries[cur].skipped = false; })}>{v('unskip')}</button></p> : e.sets.map((s: any, si: number) => (
           <div key={si} className={'setcard' + (s.done ? ' done' : '')}>
-            <div className="row" style={{ alignItems: 'center' }}><b>#{si + 1}</b><span className="muted" style={{ flex: 1 }}>{v('planned')}: {s.pr ?? '—'} {v('reps')}{s.pk ? ` × ${s.pk} ${v('kg')}` : ''} → {v('actual')}</span>{s.done && <span>✅</span>}</div>
+            <div className="row" style={{ alignItems: 'center' }}><b>#{si + 1}</b><span className="muted" style={{ flex: 1 }}>{v('planned')}: {s.pr ?? '—'} {v('reps')}{s.pk ? ` × ${s.pk} ${v('kg')}` : ''} → {v('actual')}</span>{s.done && <span><I n="checkc" /></span>}</div>
             <div className="row" style={{ justifyContent: 'space-around', flexWrap: 'wrap' }}>
               <span className="stepper"><button className="ghost big" disabled={ps} onClick={() => adj(si, 'reps', -1)}>−</button><input inputMode="numeric" aria-label={v('reps')} value={s.reps} disabled={ps} onChange={(ev) => setF(si, { reps: ev.target.value })} /><button className="ghost big" disabled={ps} onClick={() => adj(si, 'reps', 1)}>+</button><small>{v('reps')}</small></span>
               <span className="stepper"><button className="ghost big" disabled={ps} onClick={() => adj(si, 'kg', -2.5)}>−</button><input inputMode="decimal" aria-label={v('kg')} value={s.kg} disabled={ps} onChange={(ev) => setF(si, { kg: ev.target.value })} /><button className="ghost big" disabled={ps} onClick={() => adj(si, 'kg', 2.5)}>+</button><small>{v('kg')}</small></span>
             </div>
             <div className="row" style={{ flexWrap: 'wrap', alignItems: 'center' }}>
-              {s.done ? <button className="ghost big" disabled={ps} onClick={() => { if (tap()) save(L.undoSet(d, cur, si)); }}>↺ {v('undo')}</button> : <button className="big" style={{ flex: 1 }} disabled={ps} onClick={() => { if (tap()) save(L.completeSet(d, cur, si, Date.now())); }}>✓ {v('done')}</button>}
+              {s.done ? <button className="ghost big" disabled={ps} onClick={() => { if (tap()) save(L.undoSet(d, cur, si)); }}><I n="refresh" /> {v('undo')}</button> : <button className="big" style={{ flex: 1 }} disabled={ps} onClick={() => { if (tap()) save(L.completeSet(d, cur, si, Date.now())); }}><I n="check" /> {v('done')}</button>}
               <select aria-label={v('rpe')} value={s.rpe ?? ''} onChange={(ev) => setF(si, { rpe: ev.target.value })}><option value="">RPE —</option>{[6, 7, 8, 9, 10].map((n) => <option key={n} value={n}>RPE {n}</option>)}</select>
-              <button className="ghost" onClick={() => { const t = prompt(v('note'), s.note ?? ''); if (t !== null) setF(si, { note: t }); }}>📝{s.note ? '•' : ''}</button>
+              <button className="ghost" onClick={() => { const t = prompt(v('note'), s.note ?? ''); if (t !== null) setF(si, { note: t }); }}><I n="note" />{s.note ? '•' : ''}</button>
               <button className={s.warm ? 'chip on' : 'chip'} disabled={s.done} onClick={() => setF(si, { warm: !s.warm })}>{v('warm')}</button>
             </div>
           </div>))}
         {!e.skipped && <div className="row"><button className="ghost" onClick={() => { if (tap()) mut((c) => { const l = c.entries[cur].sets.slice(-1)[0]; c.entries[cur].sets.push({ kg: l?.kg ?? '', pk: l?.pk, reps: l?.reps ?? '10', pr: l?.pr, done: false }); }); }}>{v('addSet')}</button>
           <button className="ghost" disabled={!e.sets.length || e.sets[e.sets.length - 1].done} onClick={() => { if (tap()) mut((c) => { c.entries[cur].sets.pop(); }); }}>{v('delSet')}</button>
-          <button className="ghost" onClick={() => mut((c) => { c.entries[cur].skipped = true; if (cur < c.entries.length - 1) c.cur = cur + 1; })}>⏭ {v('skipEx')}</button></div>}
-        <div className="row"><input placeholder={'📝 ' + v('note')} value={e.note ?? ''} onChange={(ev) => mut((c) => { c.entries[cur].note = ev.target.value; })} /><button className={e.pain ? 'danger' : 'ghost'} onClick={() => mut((c) => { c.entries[cur].pain = !c.entries[cur].pain; })}>{v('pain')}</button></div>
+          <button className="ghost" onClick={() => mut((c) => { c.entries[cur].skipped = true; if (cur < c.entries.length - 1) c.cur = cur + 1; })}><I n="skip" /> {v('skipEx')}</button></div>}
+        <div className="row"><input placeholder={'' + v('note')} value={e.note ?? ''} onChange={(ev) => mut((c) => { c.entries[cur].note = ev.target.value; })} /><button className={e.pain ? 'danger' : 'ghost'} onClick={() => mut((c) => { c.entries[cur].pain = !c.entries[cur].pain; })}>{v('pain')}</button></div>
       </div>
       <div className="row"><button className="ghost big" disabled={cur === 0} onClick={() => mut((c) => { c.cur = cur - 1; })}>{lang === 'ar' ? '→' : '←'}</button>
         <span className="muted" style={{ flex: 1, textAlign: 'center' }}>{v('next')}: {nxt ? name(nxt.exId) : v('none')}</span>
         <button className="big" disabled={cur >= d.entries.length - 1} onClick={() => mut((c) => { c.cur = cur + 1; })}>{lang === 'ar' ? '←' : '→'}</button></div>
-      <select value={pick} onChange={(ev) => addEx(ev.target.value)}><option value="">➕ {v('addEx')}</option>{[...(EXERCISES as any[]).map((x) => ({ id: x.id, name: x[lang] })), ...cust.map((c: any) => ({ id: c.id, name: c.name }))].map((x: any) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
-      {d.entries.length > 1 && <button className="ghost" onClick={() => mut((c) => { c.entries.splice(cur, 1); c.cur = Math.max(0, cur - 1); })}>🗑️ {v('rmEx')}</button>}
+      <select value={pick} onChange={(ev) => addEx(ev.target.value)}><option value=""><I n="plus" /> {v('addEx')}</option>{[...(EXERCISES as any[]).map((x) => ({ id: x.id, name: x[lang] })), ...cust.map((c: any) => ({ id: c.id, name: c.name }))].map((x: any) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
+      {d.entries.length > 1 && <button className="ghost" onClick={() => mut((c) => { c.entries.splice(cur, 1); c.cur = Math.max(0, cur - 1); })}><I n="trash" /> {v('rmEx')}</button>}
       <label className="row"><input type="checkbox" checked={d.autoRest !== false} onChange={(ev) => mut((c) => { c.autoRest = ev.target.checked; })} style={{ flex: 'none', minHeight: 0 }} /> {v('auto')}</label>
       <label className="row"><input type="checkbox" checked={alertOn} onChange={(ev) => { setAlertOn(ev.target.checked); if (ev.target.checked && typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); }} style={{ flex: 'none', minHeight: 0 }} /> {v('alert')}</label>
-      <p className="muted">{v('alertNote')}</p><p className="muted">⚠️ {v('disc')}</p>
-      <button className="big" onClick={finish}>💾 {v('finish')}</button>
-      <button className="ghost" onClick={() => { if (confirm(v('confAb'))) onAbandon(); }}>🗑️ {v('abandon')}</button>
+      <p className="muted">{v('alertNote')}</p><p className="muted"><I n="warn" /> {v('disc')}</p>
+      <button className="big" onClick={finish}><I n="save" /> {v('finish')}</button>
+      <button className="ghost" onClick={() => { if (confirm(v('confAb'))) onAbandon(); }}><I n="trash" /> {v('abandon')}</button>
     </section>
   );
 }

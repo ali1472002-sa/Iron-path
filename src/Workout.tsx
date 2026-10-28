@@ -3,20 +3,21 @@ import { Lang } from './i18n';
 import { EXERCISES } from './exercises';
 import * as db from './db';
 import Live, { SummaryCard } from './Live';
+import { I } from './Icon';
 
 type SetRow = { kg: string; reps: string; done: boolean; rest?: number };
 type Entry = { exId: string; sets: SetRow[]; note?: string; pain?: boolean };
 type Session = { id: string; date: string; entries: Entry[]; planId?: string; dayId?: string };
 
 const W: Record<string, [string, string]> = {
-  plan:['خطة التدريب','Training plan'], emptyPlan:['أضف تمارين من تبويب التمارين.','Add exercises from the Exercises tab.'],
+  plan:['خطة التدريب','Training plan'], emptyPlan:['أضف تمارين من المزيد ← التمارين.','Add exercises from More → Exercises.'],
   start:['ابدأ التمرين','Start workout'], finish:['إنهاء وحفظ','Finish & save'], cancel:['إلغاء','Cancel'],
   kg:['كغم','kg'], reps:['تكرار','reps'], sets:['مجموعات','sets'], addSet:['مجموعة','Set'], rest:['الراحة','Rest'],
   hist:['السجل','History'], noHist:['لا توجد تمارين محفوظة','No saved workouts'], vol:['الحجم','Volume'],
   up:['اقتراح: ارفع الوزن إلى','Suggestion: increase to'], keep:['اقتراح: ثبّت الوزن عند','Suggestion: stay at'],
   more:['اقتراح: حاول زيادة تكرار واحد','Suggestion: try one more rep'],
   note:['الاقتراح مبني على آخر تمرين لك: إن أكملت كل التكرارات المستهدفة يُقترح رفع 2.5 كغم.','Based on your last session: if you hit all target reps, +2.5 kg is suggested.'],
-  over:['انتهت الراحة ✅','Rest over ✅'],
+  over:['انتهت الراحة ','Rest over '],
   hold:['الأداء انخفض عن الجلسة السابقة: لا زيادة مقترحة','Performance dropped vs the previous session: no increase suggested'],
   pain:['سجّلت ألماً في آخر جلسة: لا زيادة مقترحة','You logged pain last session: no increase suggested'],
   accept:['قبول','Accept'], reject:['تجاهل','Dismiss'], last:['آخر مرة:','Last time:'], today:['حجم اليوم / آخر مرة:','Volume today / last:'],
@@ -130,7 +131,7 @@ export default function Workout({ lang, link, clearLink }: { lang: Lang; link?: 
           onFinish={(s: any) => { setSummary(s); setDraft(null); load(); }} onAbandon={async () => { await db.remove('workouts', 'draft'); setDraft(null); load(); }} />
       ) : (
         <section className="card">
-          <h2>🗓️ {w('plan')}</h2>
+          <h2><I n="cal" /> {w('plan')}</h2>
           {plan.length === 0 ? <p className="muted">{w('emptyPlan')}</p> : plan.map((p, k) => (
             <div key={p.exId} className="row srow">
               <b style={{ flex: 1 }}>{nm(p.exId)}</b>
@@ -140,19 +141,19 @@ export default function Workout({ lang, link, clearLink }: { lang: Lang; link?: 
               <button className="ghost" onClick={() => editPlan(k, { reps: Math.max(1, p.reps - 1) })}>−</button>
               <span>{p.reps}</span>
               <button className="ghost" onClick={() => editPlan(k, { reps: p.reps + 1 })}>+</button>
-              <button className="ghost" onClick={() => removePlan(k)}>✕</button>
+              <button className="ghost" onClick={() => removePlan(k)}><I n="x" /></button>
             </div>
           ))}
-          <button onClick={start}>▶️ {plan.length ? w('start') : w('empty')}</button>{plan.length > 0 && <p className="muted">{w('note')}</p>}
+          <button className="primary" onClick={start}><I n="play" /> {plan.length ? w('start') : w('empty')}</button>{plan.length > 0 && <p className="muted">{w('note')}</p>}
         </section>
       )}
       <section className="card" style={{ marginTop: 12 }}>
-        <h2>📜 {w('hist')}</h2>
+        <h2><I n="file" /> {w('hist')}</h2>
         {hist.length === 0 && <p className="muted">{w('noHist')}</p>}
         {hist.slice(0, 15).map((s) => (
           <div key={s.id} className="row srow">
             <span style={{ flex: 1 }}>{s.date.slice(0, 10)} · {s.entries.length} · {w('vol')} {volume(s)}</span>
-            <button className="ghost" onClick={async () => { await db.remove('workouts', s.id); load(); }}>🗑️</button>
+            <button className="ghost" onClick={async () => { await db.remove('workouts', s.id); load(); }}><I n="trash" /></button>
           </div>
         ))}
       </section>

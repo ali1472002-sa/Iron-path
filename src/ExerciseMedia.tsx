@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Lang } from './i18n';
 import { MEDIA } from './media';
 import { Prim, prims } from './rig';
+import { I } from './Icon';
 
 const X: Record<string, [string, string]> = {
   start:['البداية','Start'], mid:['منتصف الحركة','Mid-movement'], end:['النهاية','End'], play:['تشغيل','Play'], pause:['إيقاف','Pause'], prev:['السابق','Previous'], next:['التالي','Next'],
@@ -51,12 +52,12 @@ export default function ExerciseMedia({ exId, lang, primary, secondary }: { exId
       <svg viewBox="0 -12 100 112" className="fig" role="img" aria-label={m.caption[i]} style={{ maxHeight: 340 }}>{prims(m.frames, t, m.cfg, { p: primary, s: secondary }).map(el)}</svg>
       {n > 1 && (
         <div className="row" style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <button className="ghost" aria-label={x('prev')} onClick={() => { setPlaying(false); setIdx((idx + 2) % 3); }}>{lang === 'ar' ? '▶' : '◀'}</button>
+          <button className="ghost" aria-label={x('prev')} onClick={() => { setPlaying(false); setIdx((idx + 2) % 3); }}><I n="chevl" /></button>
           <b>{playing ? '…' : label}</b>
-          <button className="ghost" aria-label={x('next')} onClick={() => { setPlaying(false); setIdx((idx + 1) % 3); }}>{lang === 'ar' ? '◀' : '▶'}</button>
-          {!reduce && <button className="chip" onClick={() => setPlaying(!playing)}>{playing ? '⏸ ' + x('pause') : '▶ ' + x('play')}</button>}
+          <button className="ghost" aria-label={x('next')} onClick={() => { setPlaying(false); setIdx((idx + 1) % 3); }}><I n="chevr" /></button>
+          {!reduce && <button className="chip" onClick={() => setPlaying(!playing)}><I n={playing ? 'pause' : 'play'} s={16} /> {playing ? x('pause') : x('play')}</button>}
         </div>)}
-      <p className="muted">🟠 {x('pri')} · 🟡 {x('sec')} · {x('arrow')}</p>
+      <p className="muted"><I n="circle" /> {x('pri')} · <I n="circle" /> {x('sec')} · {x('arrow')}</p>
       {cap}
       <p className="muted">{x('note')}</p>
     </div>

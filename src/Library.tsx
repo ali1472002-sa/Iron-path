@@ -8,6 +8,7 @@ import ExerciseMedia from './ExerciseMedia';
 import { MEDIA } from './media';
 import { DEFAULT, alts, prescribe } from './planGen';
 import * as db from './db';
+import { I } from './Icon';
 
 type Item = { id: string; name: string; muscle: string; steps: string[]; pose?: string; meta?: string[]; search: string; custom?: boolean; ref?: string };
 const F0 = { m: 'all', eq: 'all', ty: 'all', lv: 'all' };
@@ -72,20 +73,20 @@ export default function Library({ lang }: { lang: Lang }) {
         {x.meta && <p><b>{u('primary')}:</b> {lb(x.meta[0])}<br /><b>{u('secondary')}:</b> {x.meta[1].split(',').filter(Boolean).map(lb).join(lang === 'ar' ? '، ' : ', ')}</p>}
         <ExerciseMedia exId={x.id} lang={lang} primary={x.meta ? [x.meta[0]] : []} secondary={x.meta ? x.meta[1].split(',').filter(Boolean) : []} />
         {!MEDIA[x.id] && <p className="muted">{u('noFig')}</p>}
-        {x.ref && <p className="muted">📚 {x.ref}</p>}
-        <h3>📋 {u('steps')}</h3>
+        {x.ref && <p className="muted"><I n="book" /> {x.ref}</p>}
+        <h3><I n="clip" /> {u('steps')}</h3>
         <ol>{x.steps.map((s, k) => <li key={k}>{s}</li>)}</ol>
         {pi && <>
-          <h3>🫁 {u('breath')}</h3><p>{pi[0][i]}</p>
-          <h3>⚠️ {u('mistakes')}</h3><ul className="plain">{pi[1][i].split('|').map((s, k) => <li key={k}>• {s}</li>)}</ul>
-          <p className="warn">🛡️ <b>{u('safety')}:</b> {pi[2][i]}</p>
+          <h3><I n="wind" /> {u('breath')}</h3><p>{pi[0][i]}</p>
+          <h3><I n="warn" /> {u('mistakes')}</h3><ul className="plain">{pi[1][i].split('|').map((s, k) => <li key={k}>• {s}</li>)}</ul>
+          <p className="warn"><I n="shield" /> <b>{u('safety')}:</b> {pi[2][i]}</p>
         </>}
-        {rx && <><h3>🎯 {u('rx')}</h3><p>{rx.sets} × {rx.repMin}–{rx.repMax}{rx.unit ? 's' : ''} · {u('restW')} {rx.rest}s</p><p className="muted">{u('prog')}</p></>}
-        {alt.length > 0 && <><h3>🔄 {u('alts')}</h3><div className="chips">{alt.map((id) => <button key={id} className="chip" onClick={() => setOpen(id)}>{(EXERCISES as any[]).find((e) => e.id === id)?.[lang]}</button>)}</div></>}
+        {rx && <><h3><I n="target" /> {u('rx')}</h3><p>{rx.sets} × {rx.repMin}–{rx.repMax}{rx.unit ? 's' : ''} · {u('restW')} {rx.rest}s</p><p className="muted">{u('prog')}</p></>}
+        {alt.length > 0 && <><h3><I n="refresh" /> {u('alts')}</h3><div className="chips">{alt.map((id) => <button key={id} className="chip" onClick={() => setOpen(id)}>{(EXERCISES as any[]).find((e) => e.id === id)?.[lang]}</button>)}</div></>}
         <div className="row">
-          <button onClick={() => toggleFav(x.id)}>{favs.includes(x.id) ? '⭐' : '☆'}</button>
-          <button style={{ flex: 1 }} onClick={() => togglePlan(x.id)}>{plan.some((p) => p.exId === x.id) ? u('inPlan') : '🗓️ ' + u('addPlan')}</button>
-          {x.custom && <button className="danger" onClick={async () => { await db.remove('exercises', x.id); setOpen(''); load(); }}>🗑️</button>}
+          <button onClick={() => toggleFav(x.id)}><I n="star" className={favs.includes(x.id) ? 'fill' : ''} /></button>
+          <button style={{ flex: 1 }} onClick={() => togglePlan(x.id)}>{plan.some((p) => p.exId === x.id) ? u('inPlan') : '' + u('addPlan')}</button>
+          {x.custom && <button className="danger" onClick={async () => { await db.remove('exercises', x.id); setOpen(''); load(); }}><I n="trash" /></button>}
         </div>
       </section>
     );
@@ -93,7 +94,7 @@ export default function Library({ lang }: { lang: Lang }) {
 
   return (
     <section className="card">
-      <h2>📚 {T('lib')}</h2>
+      <h2><I n="book" /> {T('lib')}</h2>
       <input placeholder={T('search')} value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="filters">
         <select value={flt.m} onChange={(e) => setFlt({ ...flt, m: e.target.value })}>
@@ -105,23 +106,23 @@ export default function Library({ lang }: { lang: Lang }) {
           </select>
         ))}
       </div>
-      <button className={'chip' + (onlyFav ? ' on' : '')} onClick={() => setOnlyFav(!onlyFav)}>⭐ {u('favOnly')}</button>
+      <button className={'chip' + (onlyFav ? ' on' : '')} onClick={() => setOnlyFav(!onlyFav)}><I n="star" /> {u('favOnly')}</button>
       {plan.length > 0 && (
-        <p className="muted">🗓️ {u('plan')}: {plan.map((p) => all.find((a) => a.id === p.exId)?.name).filter(Boolean).join(' • ')}</p>
+        <p className="muted"><I n="cal" /> {u('plan')}: {plan.map((p) => all.find((a) => a.id === p.exId)?.name).filter(Boolean).join(' • ')}</p>
       )}
       <ul>
         {items.length === 0 && <li className="muted">{u('none')}</li>}
         {items.slice(0, shown).map((e) => (
           <li key={e.id} className="ex">
             <div className="row" onClick={() => setOpen(e.id)}>
-              <b style={{ flex: 1 }}>{favs.includes(e.id) ? '⭐ ' : ''}{e.name}</b>
+              <b style={{ flex: 1 }}>{favs.includes(e.id) ? <I n="star" className="fill" s={14} /> : ''}{e.name}</b>
               <span className="muted">{e.meta ? lb(e.meta[0]) : T(e.muscle)}</span>
             </div>
           </li>
         ))}
       </ul>
       {items.length > shown && <button className="ghost" onClick={() => setShown(shown + 40)}>{u('more')} ({items.length - shown})</button>}
-      <div className="ent"><b>⬇️ {u('importEx')}</b><span className="muted">{u('importHelp')}</span>
+      <div className="ent"><b><I n="download" s={16} /> {u('importEx')}</b><span className="muted">{u('importHelp')}</span>
         <input type="file" accept="application/json,.json" onChange={async (ev) => {
           const file = ev.target.files?.[0]; if (!file) return; setMsg(''); setRep(null);
           try {
@@ -134,17 +135,17 @@ export default function Library({ lang }: { lang: Lang }) {
           } catch (e: any) { setMsg(e.message); }
         }} />
         {msg && <p className="warn">{msg}</p>}
-        {rep && <p>📋 {rep.imported} / {rep.updated} / {rep.skipped} / {rep.rejected} / {rep.nearDup} <span className="muted">({u('repKey')})</span></p>}
-        {cust.some((c) => c.ref) && <button className="ghost" onClick={async () => { if (confirm(u('delImp') + '?')) { for (const c of cust.filter((x) => x.ref)) await db.remove('exercises', c.id); load(); } }}>🗑️ {u('delImp')} ({cust.filter((c) => c.ref).length})</button>}
+        {rep && <p><I n="clip" /> {rep.imported} / {rep.updated} / {rep.skipped} / {rep.rejected} / {rep.nearDup} <span className="muted">({u('repKey')})</span></p>}
+        {cust.some((c) => c.ref) && <button className="ghost" onClick={async () => { if (confirm(u('delImp') + '?')) { for (const c of cust.filter((x) => x.ref)) await db.remove('exercises', c.id); load(); } }}><I n="trash" /> {u('delImp')} ({cust.filter((c) => c.ref).length})</button>}
       </div>
       {form ? (
         <>
           <input placeholder={T('exName')} value={n} onChange={(e) => setN(e.target.value)} />
           <select value={m} onChange={(e) => setM(e.target.value)}>{MUSCLES.map((k) => <option key={k} value={k}>{T(k)}</option>)}</select>
           <textarea rows={4} placeholder={T('exSteps')} value={st} onChange={(e) => setSt(e.target.value)} />
-          <button onClick={saveCustom}>💾 {T('save')}</button>
+          <button className="primary" onClick={saveCustom}><I n="save" /> {T('save')}</button>
         </>
-      ) : <button onClick={() => setForm(true)}>➕ {T('newEx')}</button>}
+      ) : <button onClick={() => setForm(true)}><I n="plus" /> {T('newEx')}</button>}
     </section>
   );
 }

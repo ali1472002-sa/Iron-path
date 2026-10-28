@@ -5,10 +5,11 @@ import FoodsPanel from './FoodsPanel';
 import { normText } from './refdata';
 import { ACT, Macros, NProfile, P0, estimate, validate } from './nutri';
 import * as db from './db';
+import { I } from './Icon';
 
 const N: Record<string, [string, string]> = {
   day:['اليوم','Day'], prog:['التقدم','Progress'], foods:['الأطعمة','Foods'], prof:['الملف','Profile'],
-  b:['🍳 فطور','🍳 Breakfast'], l:['🍛 غداء','🍛 Lunch'], d:['🥗 عشاء','🥗 Dinner'], s:['🍎 وجبات خفيفة','🍎 Snacks'],
+  b:['فطور','Breakfast'], l:['غداء','Lunch'], d:['عشاء','Dinner'], s:['وجبات خفيفة','Snacks'],
   kcal:['سعرة','kcal'], p:['بروتين','Protein'], c:['كربوهيدرات','Carbs'], f:['دهون','Fat'], g:['غ','g'], left:['المتبقي','Left'], target:['الهدف','Target'],
   noTarget:['أكمل ملفك الشخصي لتظهر الأهداف.','Complete your profile to see targets.'], search:['ابحث عن طعام…','Search foods…'], done:['تم','Done'],
   freq:['الأكثر استخداماً','Frequent'], saved:['وجباتي المحفوظة','Saved meals'], saveMeal:['حفظ كوجبة','Save as meal'], mealName:['اسم الوجبة','Meal name'],
@@ -16,9 +17,9 @@ const N: Record<string, [string, string]> = {
   age:['العمر','Age'], sex:['الجنس (مطلوب للمعادلة)','Sex (needed for the equation)'], m:['ذكر','Male'], fm:['أنثى','Female'], h:['الطول (سم)','Height (cm)'], w:['الوزن (كغم)','Weight (kg)'],
   goal:['الهدف','Goal'], gain:['زيادة عضل','Muscle gain'], loss:['خسارة دهون','Fat loss'], keep:['ثبات الوزن','Maintenance'], act:['مستوى النشاط','Activity level'],
   rate:['معدل التغيّر (كغم/أسبوع)','Rate (kg/week)'], prefs:['تفضيلات غذائية أو قيود (اختياري)','Dietary preferences / restrictions (optional)'], opt:['اختياري','optional'],
-  save:['حفظ','Save'], saved2:['تم الحفظ ✅','Saved ✅'], bad:['قيمة غير صالحة: ','Invalid value: '], err:['خطأ: ','Error: '],
+  save:['حفظ','Save'], saved2:['تم الحفظ ','Saved '], bad:['قيمة غير صالحة: ','Invalid value: '], err:['خطأ: ','Error: '],
   a0:['خامل (عمل مكتبي)','Sedentary'], a1:['خفيف (1–3 أيام)','Light (1–3 days)'], a2:['متوسط (3–5 أيام)','Moderate (3–5 days)'], a3:['عالٍ (6–7 أيام)','High (6–7 days)'], a4:['شديد جداً','Very high'],
-  est:['⚠️ هذه تقديرات أولية وليست قياسات دقيقة. راقب وزنك 2–3 أسابيع وعدّل الهدف حسب النتيجة.','⚠️ These are starting estimates, not exact measurements. Watch your weight for 2–3 weeks and adjust.'],
+  est:['هذه تقديرات أولية وليست قياسات دقيقة. راقب وزنك 2–3 أسابيع وعدّل الهدف حسب النتيجة.','These are starting estimates, not exact measurements. Watch your weight for 2–3 weeks and adjust.'],
   how:['طريقة الحساب','How it is calculated'], manual:['تعديل الأهداف يدوياً','Edit targets manually'], reset:['العودة للتقدير','Back to estimate'],
   floor:['رُفعت السعرات إلى الحد الأدنى الآمن العام.','Calories were raised to a general safe minimum.'], minor:['تحت 18 سنة لا يُطبَّق عجز سعرات. استشر مختصاً.','Under 18: no calorie deficit applied. Consult a professional.'],
   newFood:['طعام مخصص','Custom food'], fname:['الاسم','Name'], per100:['القيم لكل 100 غ','Values per 100 g'], serv:['حصة افتراضية (غ)','Default serving (g)'], del:['حذف','Delete'],
@@ -111,9 +112,9 @@ export default function Nutrition({ lang }: { lang: Lang }) {
         <label>{n('act')}<select value={prof.act} onChange={(e) => setProf({ ...prof, act: +e.target.value })}>{ACT.map((a, k) => <option key={a} value={a}>{n('a' + k)}</option>)}</select></label>
         <label>{n('rate')}<select value={prof.rate} onChange={(e) => setProf({ ...prof, rate: +e.target.value })}>{[0.25, 0.5, 0.75].map((x) => <option key={x} value={x}>{x}</option>)}</select></label>
         <label>{n('prefs')}<input value={prof.prefs ?? ''} onChange={(e) => setProf({ ...prof, prefs: e.target.value })} /></label>
-        <button onClick={save}>💾 {n('save')}</button>{err}
+        <button className="primary" onClick={save}><I n="save" /> {n('save')}</button>{err}
         {!est ? <p className="muted">{n('noTarget')}</p> : (
-          <div className="ent"><h3>🧮 {n('how')}</h3>
+          <div className="ent"><h3><I n="calc" /> {n('how')}</h3>
             <p className="muted">BMR = 10×{prof.w} + 6.25×{prof.h} − 5×{prof.age} {prof.sex === 'm' ? '+ 5' : '− 161'} = <b>{est.bmr}</b><br />
               × {prof.act} → <b>{est.tdee}</b> {n('kcal')} (maintenance)<br />{est.adj >= 0 ? '+' : ''}{est.adj} → <b>{est.k}</b> {n('kcal')}<br />
               {n('p')} {est.p}{n('g')} · {n('c')} {est.c}{n('g')} · {n('f')} {est.f}{n('g')}</p>
@@ -122,7 +123,7 @@ export default function Nutrition({ lang }: { lang: Lang }) {
           <div className="ent"><b>{n('manual')}</b>
             {(['k', 'p', 'c', 'f'] as const).map((k) => <label key={k}>{n(k === 'k' ? 'kcal' : k)}<input inputMode="numeric" value={prof.manual![k]} onChange={(e) => setProf({ ...prof, manual: { ...prof.manual!, [k]: +e.target.value || 0 } })} /></label>)}
             <button className="ghost" onClick={() => setProf({ ...prof, manual: null })}>{n('reset')}</button></div>
-        ) : <button className="ghost" onClick={() => setProf({ ...prof, manual: { k: est.k, p: est.p, c: est.c, f: est.f } })}>✏️ {n('manual')}</button>)}
+        ) : <button className="ghost" onClick={() => setProf({ ...prof, manual: { k: est.k, p: est.p, c: est.c, f: est.f } })}><I n="edit" /> {n('manual')}</button>)}
       </section>
     );
   }
@@ -138,15 +139,15 @@ export default function Nutrition({ lang }: { lang: Lang }) {
     const woW = sessions.filter((s) => Date.now() - Date.parse(s.date) <= 7 * 864e5).length;
     return (
       <section className="card">{tabs}{err}
-        <h3>📅 {n('week')}</h3>
+        <h3><I n="cal" /> {n('week')}</h3>
         {used.length === 0 ? <p className="muted">{n('empty')}</p> : <p>{n('avgK')}: <b>{avg((m) => m.k)}</b> · {n('avgP')}: <b>{avg((m) => m.p)}{n('g')}</b> ({used.length} {n('daysLogged')})</p>}
-        <h3>🎯 {n('tvA')}</h3>
+        <h3><I n="target" /> {n('tvA')}</h3>
         {!tg ? <p className="muted">{n('noTarget')}</p> : per.map((x) => <div key={x.d}><span className="muted">{x.d.slice(5)} · {x.has ? `${r(x.t.k)} / ${tg.k}` : '—'}</span><Bar v={x.t.k} max={tg.k} /></div>)}
-        <h3>⚖️ {n('weight')}</h3>
+        <h3><I n="scale" /> {n('weight')}</h3>
         <div className="row"><input inputMode="decimal" placeholder={n('w')} value={wIn} onChange={(e) => setWIn(e.target.value)} />
           <button onClick={() => { const v = parseFloat(wIn); if (!(v > 20 && v < 400)) { setMsg(n('bad') + n('w')); return; } run(async () => { await db.put('measurements', { id: crypto.randomUUID(), date: ld(new Date()), weightKg: v }); setWIn(''); setMsg(''); }); }}>{n('addW')}</button></div>
         {wl.length < 2 ? <p className="muted">{n('needMore')}</p> : <><Line pts={wl.map((x) => x.weightKg)} /><p className="muted">{n('change')}: {(wl[wl.length - 1].weightKg - wl[0].weightKg).toFixed(1)} kg ({wl[0].date} → {wl[wl.length - 1].date})</p></>}
-        <h3>🏋️ {n('wo')}: {woW}</h3>
+        <h3><I n="dumbbell" /> {n('wo')}: {woW}</h3>
       </section>
     );
   }
@@ -157,27 +158,27 @@ export default function Nutrition({ lang }: { lang: Lang }) {
   );
   return (
     <section className="card">{tabs}
-      <div className="row"><button className="ghost" onClick={() => shift(-1)}>{lang === 'ar' ? '▶' : '◀'}</button>
+      <div className="row"><button className="ghost" onClick={() => shift(-1)}><I n="chevl" /></button>
         <input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
-        <button className="ghost" onClick={() => shift(1)}>{lang === 'ar' ? '◀' : '▶'}</button></div>
+        <button className="ghost" onClick={() => shift(1)}><I n="chevr" /></button></div>
       {err}
-      <div className="ent"><b>🔥 {r(T.k)}{tg ? ` / ${tg.k}` : ''} {n('kcal')}{tg ? ` · ${n('left')} ${r(tg.k - T.k)}` : ''}</b>
+      <div className="ent"><b><I n="flame" /> {r(T.k)}{tg ? ` / ${tg.k}` : ''} {n('kcal')}{tg ? ` · ${n('left')} ${r(tg.k - T.k)}` : ''}</b>
         {tg && <Bar v={T.k} max={tg.k} />}{mac('p')}{mac('c')}{mac('f')}{!tg && <p className="muted">{n('noTarget')}</p>}</div>
       {entries.length === 0 && <p className="muted">{n('empty')}</p>}
       {MEALS.map((m) => {
         const es = entries.filter((e) => e.meal === m);
         return (
           <div key={m} className="ent"><div className="row"><b style={{ flex: 1 }}>{n(m)} · {r(tot(es).k)} {n('kcal')}</b>
-            {es.length > 0 && <button className="ghost" onClick={() => { const nm = prompt(n('mealName')); if (nm) run(() => db.put('nutrition', { id: 'meal:' + crypto.randomUUID(), name: nm, entries: es.map(({ id, meal, ...x }) => x) })); }}>💾</button>}
-            <button className="ghost" onClick={() => { setAdding(adding === m ? '' : m); setQ(''); }}>{adding === m ? n('done') : '➕'}</button></div>
+            {es.length > 0 && <button className="ghost" onClick={() => { const nm = prompt(n('mealName')); if (nm) run(() => db.put('nutrition', { id: 'meal:' + crypto.randomUUID(), name: nm, entries: es.map(({ id, meal, ...x }) => x) })); }}><I n="save" /></button>}
+            <button className="ghost" onClick={() => { setAdding(adding === m ? '' : m); setQ(''); }}>{adding === m ? n('done') : <I n="plus" />}</button></div>
             {es.map((e) => (
               <div key={e.id} className="row srow"><span style={{ flex: 1 }}>{e.name}<br /><span className="muted">{r((e.per.k * e.g) / 100)} {n('kcal')} · {e.src === 'custom' ? n('mine') : n('approx')}</span></span>
                 <input style={{ maxWidth: 70 }} inputMode="decimal" value={e.g} onChange={(ev) => editG(e.id, +ev.target.value)} /><span className="muted">{n('g')}</span>
-                <button className="ghost" onClick={() => setEntries(entries.filter((x) => x.id !== e.id))}>✕</button></div>))}
+                <button className="ghost" onClick={() => setEntries(entries.filter((x) => x.id !== e.id))}><I n="x" /></button></div>))}
             {adding === m && (
               <div className="ent"><input placeholder={n('search')} value={q} onChange={(e) => setQ(e.target.value)} />
                 {!q && freq.length > 0 && <div className="chips">{freq.map((f) => <button key={f.id} className="chip" onClick={() => addFood(f, m)}>{f.name}</button>)}</div>}
-                {!q && meals.length > 0 && <div className="chips">{meals.map((x) => <button key={x.id} className="chip" onClick={() => setEntries([...entries, ...x.entries.map((y: any) => ({ ...y, id: crypto.randomUUID(), meal: m }))])}>⭐ {x.name}</button>)}</div>}
+                {!q && meals.length > 0 && <div className="chips">{meals.map((x) => <button key={x.id} className="chip" onClick={() => setEntries([...entries, ...x.entries.map((y: any) => ({ ...y, id: crypto.randomUUID(), meal: m }))])}><I n="star" /> {x.name}</button>)}</div>}
                 {found.length === 0 && <p className="muted">{n('none')}</p>}
                 {found.map((f) => <button key={f.id} className="ghost" style={{ textAlign: 'start' }} onClick={() => addFood(f, m)}>{f.name} · {f.label} · {r((f.per.k * f.g) / 100)} {n('kcal')}</button>)}</div>)}
           </div>

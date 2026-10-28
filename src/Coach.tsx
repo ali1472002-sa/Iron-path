@@ -6,6 +6,7 @@ import { DEFAULT, alts } from './planGen';
 import * as A from './analytics';
 import * as C from './coach';
 import * as db from './db';
+import { I } from './Icon';
 
 const K: Record<string, [string, string]> = {
   title:['مدرب التدريب (قواعد حسابية، وليس ذكاءً اصطناعياً)','Training coach (rule-based, not AI)'], load:['جارٍ التحميل…','Loading…'], err:['خطأ: ','Error: '],
@@ -23,7 +24,7 @@ const K: Record<string, [string, string]> = {
   ex:['أداء التمرين','Exercise performance'], date:['التاريخ','Date'], top:['أثقل مجموعة','Top set'], done:['منجز/مخطط','done/planned'], volL:['الحجم','Volume'], e1:['1RM تقديري','Est. 1RM'],
   set:['إعدادات القواعد','Rule settings'], inc:['أقصى زيادة حمل (كغم)','Max load step (kg)'], rpe:['أعلى متوسط جهد مقبول للزيادة','Max average RPE allowed for an increase'], rng:['مدى المجموعات الأسبوعي (إرشاد قابل للتعديل، وليس متطلباً علمياً عاماً)','Weekly set range (adjustable guidance, not a universal requirement)'],
   hist:['سجل التوصيات','Recommendation history'], accepted:['مقبولة','accepted'], rejected:['مرفوضة','rejected'], dismissed:['مخفية','dismissed'], undo:['تراجع','Undo'], undone:['تم التراجع','undone'], act:['تفعيل النسخة','Activate copy'],
-  defs:['كيف تُحسب المقاييس','How metrics are defined'], safe:['⚠️ لا تشخيص طبي. لا تتمرّن رغم الألم، ولا تزد الحمل بقفزات كبيرة. انخفاض الأداء سبب للمراجعة وليس دليلاً على سبب بعينه.','⚠️ Not medical advice. Never train through pain or jump loads aggressively. A decline is a reason to review, not proof of a cause.'],
+  defs:['كيف تُحسب المقاييس','How metrics are defined'], safe:['لا تشخيص طبي. لا تتمرّن رغم الألم، ولا تزد الحمل بقفزات كبيرة. انخفاض الأداء سبب للمراجعة وليس دليلاً على سبب بعينه.','Not medical advice. Never train through pain or jump loads aggressively. A decline is a reason to review, not proof of a cause.'],
   d1:['مجموعة عمل = مجموعة مكتملة بتكرارات > 0 وغير موسومة كإحماء. المجموعات المخطط لها أو غير المكتملة لا تُحسب.','Working set = completed set with reps > 0, not flagged warm-up. Planned or incomplete sets are not counted.'],
   d2:['الحجم المباشر: مجموعات يكون فيها العضلة رئيسية للتمرين. غير المباشر: عضلة ثانوية، ويُعرض منفصلاً ولا يُضاف للمباشر.','Direct volume: sets where the muscle is the exercise’s primary muscle. Indirect: secondary muscle, shown separately and never added to direct.'],
   d3:['حجم التدريب = Σ (حمل × تكرار) للمجموعات العاملة. تمارين وزن الجسم (0 كغم) لا تضيف حجماً.','Training volume = Σ (load × reps) of working sets. Bodyweight sets (0 kg) add no volume.'],
@@ -71,7 +72,7 @@ export default function Coach({ lang }: { lang: Lang }) {
   };
   useEffect(() => { load(); }, []);
   const run = async (f: () => Promise<any>) => { try { await f(); await load(); } catch (e: any) { setMsg(k('err') + e.message); } };
-  if (!ready) return <section className="card"><p className="muted">⏳ {k('load')}</p></section>;
+  if (!ready) return <section className="card"><p className="muted"><I n="hourglass" /> {k('load')}</p></section>;
 
   const today = ld(new Date()), act = plans.find((p) => p.id === activeId);
   const exName = (id: string) => { const b = (EXERCISES as any[]).find((e) => e.id === id); return b ? b[lang] : cust.find((c) => c.id === id)?.name ?? id; };
@@ -118,65 +119,65 @@ export default function Coach({ lang }: { lang: Lang }) {
   return (
     <>
       <section className="card">
-        <h2>🧠 {k('title')}</h2>
+        <h2><I n="brain" /> {k('title')}</h2>
         {msg && <p className="warn">{msg}</p>}
         <div className="grid2">
-          <div className="stat">🏋️ {k('sess')}<b>{sess4}</b></div>
-          <div className="stat">📋 {k('adh')}<b>{adh ? `${adh.completed}/${adh.planned}` : '—'}</b><span className="muted">{act ? '' : k('noPlan')}</span></div>
+          <div className="stat"><I n="dumbbell" /> {k('sess')}<b>{sess4}</b></div>
+          <div className="stat"><I n="clip" /> {k('adh')}<b>{adh ? `${adh.completed}/${adh.planned}` : '—'}</b><span className="muted">{act ? '' : k('noPlan')}</span></div>
         </div>
-        {vol.missing.length + vol.coarse.length > 0 && <p className="muted">ℹ️ {k('q1')}</p>}
-        {noRpe && <p className="muted">ℹ️ {k('q2')}</p>}
-        <p className="muted">🔒 {k('noAuto')}</p>
+        {vol.missing.length + vol.coarse.length > 0 && <p className="muted"><I n="info" s={15} /> {k('q1')}</p>}
+        {noRpe && <p className="muted"><I n="info" s={15} /> {k('q2')}</p>}
+        <p className="muted"><I n="lock" /> {k('noAuto')}</p>
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>💡 {k('recs')}</h3>
+        <h3><I n="bulb" /> {k('recs')}</h3>
         {open.length === 0 && <p className="muted">{k('none')}</p>}
         {open.map((r) => { const x = text(r); const target = r.change; return (
           <div key={r.key} className="ent">
-            <b>📌 {x.obs}</b>
+            <b><I n="pin" /> {x.obs}</b>
             <span className="muted">{k('data')}: {r.range[0]} → {r.range[1]} · n={r.n}</span>
-            {x.ch && <p>👉 <b>{k('chg')}:</b> {x.ch}</p>}
+            {x.ch && <p><I n="arrow" /> <b>{k('chg')}:</b> {x.ch}</p>}
             <span className="muted">{k('unc')}: {r.unc.map((u) => k(UNC[u])).join(' · ')}</span>
-            {r.p.pain && <p className="warn">🤕 {k('r_decline_c')}</p>}
+            {r.p.pain && <p className="warn"><I n="bandage" /> {k('r_decline_c')}</p>}
             <div className="row" style={{ flexWrap: 'wrap' }}>
-              {target && <button onClick={() => setRev(r)}>✔ {k('accept')}</button>}
-              {target && <button className="ghost" onClick={() => mark(r.key, 'rejected')}>✕ {k('reject')}</button>}
+              {target && <button onClick={() => setRev(r)}><I n="check" /> {k('accept')}</button>}
+              {target && <button className="ghost" onClick={() => mark(r.key, 'rejected')}><I n="x" /> {k('reject')}</button>}
               <button className="ghost" onClick={() => mark(r.key, 'dismissed')}>{k('dismiss')}</button>
             </div>
           </div>); })}
         {rev && rev.change && (
-          <div className="ent pop"><b>🔎 {k('review')}</b>
+          <div className="ent pop"><b><I n="search" /> {k('review')}</b>
             {rev.change.type === 'target' ? <p>{k('tgt')}: <b>{exName(rev.change.exId)}</b>: {rev.change.from} → <b>{rev.change.kg}</b> kg</p>
               : <p>{k('swapT')}: <b>{exName(rev.change.from)}</b> → <b>{exName(rev.change.to)}</b></p>}
-            <div className="row"><button onClick={() => apply(rev)}>✔ {k('apply')}</button><button className="ghost" onClick={() => setRev(null)}>{k('cancel')}</button></div></div>)}
+            <div className="row"><button onClick={() => apply(rev)}><I n="check" /> {k('apply')}</button><button className="ghost" onClick={() => setRev(null)}>{k('cancel')}</button></div></div>)}
         <p className="muted">{k('safe')}</p>
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>📊 {k('vol')}</h3>
+        <h3><I n="chart" /> {k('vol')}</h3>
         <div className="row" style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <button className="ghost" disabled={off >= 12} onClick={() => setOff(off + 1)}>{lang === 'ar' ? '▶' : '◀'}</button><b>{k('wk')}: {wr[0]} → {wr[1]}</b>
-          <button className="ghost" disabled={off === 0} onClick={() => setOff(off - 1)}>{lang === 'ar' ? '◀' : '▶'}</button></div>
+          <button className="ghost" disabled={off >= 12} onClick={() => setOff(off + 1)}><I n="chevl" /></button><b>{k('wk')}: {wr[0]} → {wr[1]}</b>
+          <button className="ghost" disabled={off === 0} onClick={() => setOff(off - 1)}><I n="chevr" /></button></div>
         {vol.sessions === 0 ? <p className="muted">{k('nodata')}</p> : <>
           {C.GROUPS.filter((g) => vol.grp[g] != null).map((g) => { const [lo, hi] = cfg.ranges[g] ?? [0, 999], n = vol.grp[g]; return (
             <div key={g}><div className="row"><b style={{ flex: 1 }}>{T(g)}</b><span>{n} · {k('freq').split(' ')[0]} {vol.freq[g] ?? 0}</span><span className="muted">{n < lo ? k('below') : n > hi ? k('above') : k('within')} ({lo}–{hi})</span></div>
               <div className="bar"><i style={{ width: Math.min(100, (n / Math.max(hi, 1)) * 100) + '%' }} /></div></div>); })}
           <p className="muted">{k('freq')}: {C.GROUPS.filter((g) => vol.freq[g]).map((g) => `${T(g)} ${vol.freq[g]}`).join(' · ') || '—'}</p>
           {Object.keys(vol.direct).map((m) => <div key={m} className="row srow"><span style={{ flex: 1 }}>{lb(m)}</span><span>{vol.direct[m]} {k('direct')}</span><span className="muted">{vol.indirect[m] ?? 0} {k('indirect')}</span></div>)}
-          {vol.missing.length > 0 && <p className="muted">⚠️ {k('mapMiss')}: {vol.missing.map(exName).join(', ')}</p>}
-          {vol.coarse.length > 0 && <p className="muted">ℹ️ {k('mapCoarse')}: {vol.coarse.map(exName).join(', ')}</p>}</>}
+          {vol.missing.length > 0 && <p className="muted"><I n="warn" /> {k('mapMiss')}: {vol.missing.map(exName).join(', ')}</p>}
+          {vol.coarse.length > 0 && <p className="muted"><I n="info" s={15} /> {k('mapCoarse')}: {vol.coarse.map(exName).join(', ')}</p>}</>}
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>📈 {k('ex')}</h3>
+        <h3><I n="trend" /> {k('ex')}</h3>
         {exIds.length === 0 ? <p className="muted">{k('nodata')}</p> : <>
           <select value={curEx} onChange={(e) => setExSel(e.target.value)}>{exIds.map((id) => <option key={id} value={id}>{exName(id)}</option>)}</select>
           {eh.map((h) => <div key={h.date} className="row srow"><span style={{ flex: 1 }}>{h.date}</span><span>{h.top > 0 ? `${h.top}kg×${h.topReps}` : `${h.topReps} ${k('top')}`}</span><span className="muted">{h.workSets}/{h.prescribed ?? '—'} · {k('volL')} {Math.round(h.vol)} · {k('e1')} {h.e1rm ?? '—'}</span></div>)}</>}
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>⚙️ {k('set')}</h3>
+        <h3><I n="settings" /> {k('set')}</h3>
         <label>{k('inc')}<input inputMode="decimal" value={cfg.inc} onChange={(e) => setCfgSave({ ...cfg, inc: Math.min(5, Math.max(0.5, +e.target.value || 0.5)) })} /></label>
         <label>{k('rpe')}<input inputMode="decimal" value={cfg.maxRpe} onChange={(e) => setCfgSave({ ...cfg, maxRpe: Math.min(10, Math.max(5, +e.target.value || 8.5)) })} /></label>
         <p className="muted">{k('rng')}</p>
@@ -186,18 +187,18 @@ export default function Coach({ lang }: { lang: Lang }) {
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>🗂️ {k('hist')}</h3>
+        <h3><I n="layers" /> {k('hist')}</h3>
         {Object.keys(co.accepted).length + Object.keys(co.rejected).length + Object.keys(co.dismissed).length === 0 && <p className="muted">—</p>}
         {Object.entries(co.accepted).map(([key, a]: any) => (
-          <div key={key} className="row srow"><span style={{ flex: 1 }}>✔ {k('accepted')} · {new Date(a.ts).toLocaleDateString('sv')} · {a.type === 'target' ? `${exName(a.exId)} → ${a.kg} kg` : `${exName(a.from)} → ${exName(a.to)}`}{a.undone ? ` · ${k('undone')}` : ''}</span>
+          <div key={key} className="row srow"><span style={{ flex: 1 }}><I n="check" /> {k('accepted')} · {new Date(a.ts).toLocaleDateString('sv')} · {a.type === 'target' ? `${exName(a.exId)} → ${a.kg} kg` : `${exName(a.from)} → ${exName(a.to)}`}{a.undone ? ` · ${k('undone')}` : ''}</span>
             {a.type === 'swap' && !a.undone && activeId !== a.newPlanId && <button className="ghost" onClick={() => save({ id: 'activePlan', planId: a.newPlanId })}>{k('act')}</button>}
-            {!a.undone && <button className="ghost" onClick={() => undo(key)}>↩ {k('undo')}</button>}</div>))}
-        {Object.entries(co.rejected).map(([key, ts]: any) => <p key={key} className="muted">✕ {k('rejected')} · {new Date(ts).toLocaleDateString('sv')} · {key.split(':').slice(0, 2).join(' ')}</p>)}
+            {!a.undone && <button className="ghost" onClick={() => undo(key)}><I n="undo" /> {k('undo')}</button>}</div>))}
+        {Object.entries(co.rejected).map(([key, ts]: any) => <p key={key} className="muted"><I n="x" /> {k('rejected')} · {new Date(ts).toLocaleDateString('sv')} · {key.split(':').slice(0, 2).join(' ')}</p>)}
         {Object.entries(co.dismissed).map(([key, ts]: any) => <p key={key} className="muted">• {k('dismissed')} · {new Date(ts).toLocaleDateString('sv')} · {key.split(':').slice(0, 2).join(' ')}</p>)}
       </section>
 
       <section className="card" style={{ marginTop: 12 }}>
-        <h3>📖 {k('defs')}</h3>
+        <h3><I n="book" /> {k('defs')}</h3>
         {['d1', 'd2', 'd3', 'd4', 'd5', 'd6'].map((d) => <p key={d} className="muted">• {k(d)}</p>)}
       </section>
     </>

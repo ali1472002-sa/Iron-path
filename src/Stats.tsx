@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Lang } from './i18n';
 import { EXERCISES } from './exercises';
 import * as db from './db';
+import { I } from './Icon';
 
 const S: Record<string, [string, string]> = {
   title:['الأداء والإحصاءات','Performance & stats'], d7:['جلسات آخر 7 أيام','Sessions, last 7 days'], d30:['جلسات آخر 30 يوماً','Sessions, last 30 days'],
@@ -35,7 +36,7 @@ export default function Stats({ lang }: { lang: Lang }) {
     setHist((await db.getAll<any>('workouts')).filter((x) => x.id !== 'draft').sort((a, b) => a.date.localeCompare(b.date)));
     setCust(await db.getAll<any>('exercises'));
   })(); }, []);
-  if (!hist.length) return <section className="card"><h2>📈 {s('title')}</h2><p className="muted">{s('none')}</p></section>;
+  if (!hist.length) return <section className="card"><h2><I n="trend" /> {s('title')}</h2><p className="muted">{s('none')}</p></section>;
   const nm = (id: string) => (EXERCISES as any[]).find((e) => e.id === id)?.[lang] ?? cust.find((c) => c.id === id)?.name ?? id;
   const now = Date.now();
   const within = (d: number) => hist.filter((x) => now - Date.parse(x.date) <= d * 864e5).length;
@@ -52,12 +53,12 @@ export default function Stats({ lang }: { lang: Lang }) {
   const bestVol = [...rows].sort((a, b) => b.vol - a.vol)[0];
   return (
     <section className="card">
-      <h2>📈 {s('title')}</h2>
-      <p>📅 {s('d7')}: <b>{within(7)}</b><br />📅 {s('d30')}: <b>{within(30)}</b><br />✅ {s('sets')}: <b>{allSets.length}</b><br />🔁 {s('reps')}: <b>{sum(allSets, (r) => +r.reps || 0)}</b></p>
+      <h2><I n="trend" /> {s('title')}</h2>
+      <p><I n="cal" /> {s('d7')}: <b>{within(7)}</b><br /><I n="cal" /> {s('d30')}: <b>{within(30)}</b><br /><I n="checkc" /> {s('sets')}: <b>{allSets.length}</b><br /><I n="repeat" /> {s('reps')}: <b>{sum(allSets, (r) => +r.reps || 0)}</b></p>
       <select value={cur} onChange={(e) => setSel(e.target.value)}>{ids.map((id) => <option key={id} value={id}>{nm(id)}</option>)}</select>
-      <p>📦 {s('vol')}: <b>{Math.round(sum(rows, (r) => r.vol))}</b></p>
-      {bestSet && <p>🏆 <span className="muted">{s('best')}</span><br /><b>{bestSet.kg || 0} {s('kg')} × {bestSet.reps}</b> ({bestSet.date})</p>}
-      {bestVol && <p>📊 <span className="muted">{s('bestVol')}</span><br /><b>{Math.round(bestVol.vol)}</b> ({bestVol.date})</p>}
+      <p><I n="pkg" /> {s('vol')}: <b>{Math.round(sum(rows, (r) => r.vol))}</b></p>
+      {bestSet && <p><I n="trophy" /> <span className="muted">{s('best')}</span><br /><b>{bestSet.kg || 0} {s('kg')} × {bestSet.reps}</b> ({bestSet.date})</p>}
+      {bestVol && <p><I n="chart" /> <span className="muted">{s('bestVol')}</span><br /><b>{Math.round(bestVol.vol)}</b> ({bestVol.date})</p>}
       <h3>{s('w')}</h3><Line pts={rows.map((r) => r.kg)} few={s('few')} />
       <h3>{s('r')}</h3><Line pts={rows.map((r) => r.reps)} few={s('few')} />
     </section>

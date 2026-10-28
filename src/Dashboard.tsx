@@ -5,6 +5,7 @@ import { P0, estimate } from './nutri';
 import * as A from './analytics';
 import * as db from './db';
 import Coach from './Coach';
+import { I } from './Icon';
 
 const D: Record<string, [string, string]> = {
   title:['لوحة التقدم','Progress dashboard'], load:['جارٍ التحميل…','Loading…'], err:['خطأ: ','Error: '],
@@ -23,7 +24,7 @@ const D: Record<string, [string, string]> = {
   newB:['جديد','New'], noPr:['لا توجد مجموعات مسجلة','No recorded sets'],
   cmp:['مقارنة بالفترة السابقة','Compare with previous period'], cur:['الحالية','Current'], prev:['السابقة','Previous'], delta:['الفرق','Diff'],
   ins:['ملاحظات من بياناتك','Observations from your data'], noIns:['لا توجد ملاحظات: البيانات غير كافية أو لا شيء لافت.','No observations: not enough data or nothing notable.'],
-  rule:['القاعدة','Rule'], basis:['البيانات','Data'], sugL:['اقتراح (اختياري)','Suggestion (optional)'], doneB:['تم ✔','Done ✔'], dis:['إخفاء','Dismiss'],
+  rule:['القاعدة','Rule'], basis:['البيانات','Data'], sugL:['اقتراح (اختياري)','Suggestion (optional)'], doneB:['تم ','Done '], dis:['إخفاء','Dismiss'],
   restore:['إظهار المخفية','Show hidden'], hidden:['مخفية','hidden'],
   wNote:['هذه ملاحظة عن الأرقام فقط ولا تثبت زيادة عضل أو خسارة دهون.','This describes the numbers only; it does not prove muscle gain or fat loss.'],
   disc:['الملاحظات حسابات بسيطة مبنية على سجلاتك، وليست ذكاءً اصطناعياً أو تشخيصاً طبياً. لا تتمرّن رغم الألم، ولا تغيّر نظامك الغذائي بشكل متطرف.','Observations are simple rule-based calculations on your records, not AI or medical diagnosis. Never train through pain or make extreme diet changes.'],
@@ -95,7 +96,7 @@ export default function Dashboard({ lang }: { lang: Lang }) {
     setReady(true);
   };
   useEffect(() => { load(); }, []);
-  if (!ready) return <section className="card"><p className="muted">⏳ {d('load')}</p></section>;
+  if (!ready) return <section className="card"><p className="muted"><I n="hourglass" /> {d('load')}</p></section>;
 
   const nm = (id: string) => (EXERCISES as any[]).find((e) => e.id === id)?.[lang] ?? cust.find((c) => c.id === id)?.name ?? id;
   const today = A.ld(new Date());
@@ -143,27 +144,26 @@ export default function Dashboard({ lang }: { lang: Lang }) {
     return [T[x.id][0][i], T[x.id][1][i]];
   };
 
-  const subTabs = <div className="chips" style={{ marginBottom: 12 }}><button className={'chip' + (sub === 'ov' ? ' on' : '')} onClick={() => setSub('ov')}>📊 {lang === 'ar' ? 'نظرة عامة' : 'Overview'}</button><button className={'chip' + (sub === 'coach' ? ' on' : '')} onClick={() => setSub('coach')}>🧠 {lang === 'ar' ? 'المدرب' : 'Coach'}</button></div>;
+  const subTabs = <div className="seg"><button className={sub === 'ov' ? 'on' : ''} onClick={() => setSub('ov')}><I n="chart" s={16} /> {lang === 'ar' ? 'نظرة عامة' : 'Overview'}</button><button className={sub === 'coach' ? 'on' : ''} onClick={() => setSub('coach')}><I n="brain" s={16} /> {lang === 'ar' ? 'المدرب' : 'Coach'}</button></div>;
   if (sub === 'coach') return <>{subTabs}<Coach lang={lang} /></>;
   const chips = (['week', 'month', '7', '30', '90'] as A.Kind[]).map((k) => <button key={k} className={'chip' + (kind === k ? ' on' : '')} onClick={() => setKind(k)}>{d(k)}</button>);
   return (
     <>
       {subTabs}
-      <section className="card">
-        <h2>📊 {d('title')}</h2>
-        <div className="chips">{chips}</div>
+      <div className="stack">
+        <div className="chips wrap">{chips}</div>
         <p className="muted">{cur[0]} → {cur[1]} · {d('prev')}: {prev[0]} → {prev[1]}</p>
         {msg && <p className="warn">{msg}</p>}
         {empty ? <p className="muted">{d('empty')}</p> : (
           <div className="grid2">
-            <div className="stat">🏋️ {d('sess')}<b>{sc.length}</b><span className="muted">{d('weekMonth')}: {wkN} / {moN}</span></div>
-            <div className="stat">📦 {d('vol')}<b>{Math.round(A.volume(sc))}</b><span className="muted">{d('volNote')}</span></div>
-            <div className="stat">📋 {d('adh')}<b>{adc ? `${adc.completed}/${adc.planned}` : '—'}</b><span className="muted">{act ? d('adhNote') : d('noPlan')}</span></div>
-            <div className="stat">🍽️ {d('nut')}<b>{nc ? `${Math.round(nc.k)} ${d('kcal')}` : '—'}</b><span className="muted">{nc ? `${d('prot' as any) === 'prot' ? '' : ''}P ${Math.round(nc.p)}${d('g')} · ${nc.days}/${nc.span} ${d('days')}` : d('noNut')}</span></div>
-            <div className="stat">⚖️ {d('wt')}<b>{wc.avg != null ? wc.avg.toFixed(1) + ' kg' : '—'}</b><span className="muted">{wc.avg == null ? d('noW') : `${wc.pts.length} ${d('days')}`}</span></div>
-            <div className="stat">⏭️ {d('next')}<b>{nxt ? nxt.day.name[i] : '—'}</b><span className="muted">{nxt ? nxt.date : d('noNext')}</span></div>
+            <div className="stat"><span className="sl"><I n="dumbbell" s={15} /> {d('sess')}</span><b>{sc.length}</b><span className="muted">{d('weekMonth')}: {wkN} / {moN}</span></div>
+            <div className="stat"><span className="sl"><I n="pkg" s={15} /> {d('vol')}</span><b>{Math.round(A.volume(sc))}</b><span className="muted">{d('volNote')}</span></div>
+            <div className="stat"><span className="sl"><I n="clip" s={15} /> {d('adh')}</span><b>{adc ? `${adc.completed}/${adc.planned}` : '—'}</b><span className="muted">{act ? d('adhNote') : d('noPlan')}</span></div>
+            <div className="stat"><span className="sl"><I n="food" s={15} /> {d('nut')}</span><b>{nc ? `${Math.round(nc.k)} ${d('kcal')}` : '—'}</b><span className="muted">{nc ? `${d('prot' as any) === 'prot' ? '' : ''}P ${Math.round(nc.p)}${d('g')} · ${nc.days}/${nc.span} ${d('days')}` : d('noNut')}</span></div>
+            <div className="stat"><span className="sl"><I n="scale" s={15} /> {d('wt')}</span><b dir="ltr" style={{ textAlign: 'start' }}>{wc.avg != null ? wc.avg.toFixed(1) + ' kg' : '—'}</b><span className="muted">{wc.avg == null ? d('noW') : `${wc.pts.length} ${d('days')}`}</span></div>
+            <div className="stat"><span className="sl"><I n="cal" s={15} /> {d('next')}</span><b>{nxt ? nxt.day.name[i] : '—'}</b><span className="muted">{nxt ? nxt.date : d('noNext')}</span></div>
           </div>)}
-      </section>
+      </div>
       {!empty && <>
         <section className="card" style={{ marginTop: 12 }} dir="ltr">
           <h3>{d('cFreq')}</h3>{wk.length ? <Bars vals={wk.map((w) => w.n)} labels={[wk[0].start.slice(5), wk[wk.length - 1].start.slice(5)]} /> : <p className="muted">{d('few')}</p>}
@@ -183,33 +183,33 @@ export default function Dashboard({ lang }: { lang: Lang }) {
               <select value={met} onChange={(e) => setMet(e.target.value as any)}>{(['top', 'reps', 'vol'] as const).map((k) => <option key={k} value={k}>{k === 'vol' ? d('vol') : d(k)}</option>)}</select>
             </div>
             <div dir="ltr"><Line pts={exS.map((x) => ({ d: x.date, v: Math.round(met === 'top' ? x.top : met === 'reps' ? x.reps : x.vol) }))} few={d('few')} /></div></>}
-          <h3>🏆 {d('pr')}</h3><p className="muted">{d('prDef')}</p>
+          <h3><I n="trophy" /> {d('pr')}</h3><p className="muted">{d('prDef')}</p>
           {Object.keys(recs).length === 0 ? <p className="muted">{d('noPr')}</p> : Object.entries(recs).sort((a, b) => b[1].date.localeCompare(a[1].date)).slice(0, 6).map(([id, r]) => (
             <div key={id} className="row srow"><span style={{ flex: 1 }}>{nm(id)}</span><b>{r.kg > 0 ? `${r.kg} kg × ${r.reps}` : `${r.reps} ${d('reps')}`}</b><span className="muted">{r.date}</span>{r.prior && A.inR(r.date, cur) && <span className="chip on">{d('newB')}</span>}</div>))}
         </section>
         <section className="card" style={{ marginTop: 12 }}>
-          <h3>🔁 {d('cmp')}</h3>
+          <h3><I n="repeat" /> {d('cmp')}</h3>
           {[['sess', sc.length, sp.length, 0], ['vol', Math.round(A.volume(sc)), sp.length ? Math.round(A.volume(sp)) : null, 0], ['kcal', nc ? nc.k : null, np ? np.k : null, 0], ['P', nc ? nc.p : null, np ? np.p : null, 0], ['kg', wc.avg, wp.avg, 1]].map(([k, a, b, dp]: any) => (
-            <div key={k} className="row srow"><span style={{ flex: 1 }}>{k === 'sess' ? d('sess') : k === 'vol' ? d('vol') : k === 'kcal' ? d('kcal') : k === 'P' ? '🥩 P' : d('wt')}</span>
+            <div key={k} className="row srow"><span style={{ flex: 1 }}>{k === 'sess' ? d('sess') : k === 'vol' ? d('vol') : k === 'kcal' ? d('kcal') : k === 'P' ? 'P' : d('wt')}</span>
               <span>{fmt(a, dp)}</span><span className="muted">{fmt(b, dp)}</span><b>{dl(a, b, dp)}</b></div>))}
           <p className="muted">{d('cur')} · {d('prev')} · {d('delta')} — {d('gaps')}</p>
         </section>
         <section className="card" style={{ marginTop: 12 }}>
-          <h3>💡 {d('ins')}</h3>
+          <h3><I n="bulb" /> {d('ins')}</h3>
           {shown.length === 0 && <p className="muted">{d('noIns')}</p>}
           {shown.map((x) => {
             const [obs, rule] = txt(x), off = insR.dismissed[x.key] || insR.done[x.key];
             return (
               <div key={x.key} className="ent" style={off ? { opacity: 0.5 } : undefined}>
-                <b>📌 {obs}</b>
+                <b><I n="pin" /> {obs}</b>
                 <span className="muted">{d('basis')}: {x.range[0]} → {x.range[1]} · n={x.n}<br />{d('rule')}: {rule}</span>
                 {x.id.startsWith('w_') && <span className="muted">{d('wNote')}</span>}
-                {x.sug && <p className="warn">💭 {d('sugL')}: {d('sug_' + x.sug)}</p>}
-                {!off && <div className="row">{x.sug && <button className="ghost" onClick={() => mark(x.key, 'done')}>{d('doneB')}</button>}<button className="ghost" onClick={() => mark(x.key, 'dismissed')}>✕ {d('dis')}</button></div>}
+                {x.sug && <p className="warn"><I n="msg" /> {d('sugL')}: {d('sug_' + x.sug)}</p>}
+                {!off && <div className="row">{x.sug && <button className="ghost" onClick={() => mark(x.key, 'done')}>{d('doneB')}</button>}<button className="ghost" onClick={() => mark(x.key, 'dismissed')}><I n="x" /> {d('dis')}</button></div>}
               </div>);
           })}
           {hidden.length > 0 && <button className="ghost" onClick={() => setShowHid(!showHid)}>{d('restore')} ({hidden.length})</button>}
-          <p className="muted">⚠️ {d('disc')}</p>
+          <p className="muted"><I n="warn" /> {d('disc')}</p>
         </section></>}
     </>
   );

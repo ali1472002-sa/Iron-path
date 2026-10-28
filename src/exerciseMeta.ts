@@ -17,7 +17,7 @@ export const U: Record<string, [string, string]> = {
   primary:['العضلات الرئيسية','Primary muscles'], secondary:['العضلات الثانوية','Secondary muscles'], steps:['خطوات الأداء','How to perform'],
   breath:['التنفس','Breathing'], mistakes:['أخطاء شائعة','Common mistakes'], safety:['السلامة','Safety'],
   diagram:['مخطط توضيحي مبسّط وليس صورة واقعية','Simplified diagram, not a realistic image'],
-  plan:['الخطة الحالية','Current plan'], addPlan:['أضف إلى الخطة','Add to plan'], inPlan:['في الخطة ✔','In plan ✔'],
+  plan:['الخطة الحالية','Current plan'], addPlan:['أضف إلى الخطة','Add to plan'], inPlan:['في الخطة ','In plan '],
   favOnly:['المفضلة فقط','Favorites only'], none:['لا توجد نتائج','No results'],
 };
 // [primary, secondary (comma list), equipment, type, level]
