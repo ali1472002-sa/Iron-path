@@ -84,3 +84,14 @@
 - Safety: automatic in-app snapshot (separate IndexedDB database, last 3) before every restore, delete-all and undo; optional safety file; the restore runs in ONE IndexedDB transaction (all-or-nothing); "Undo" restores a snapshot
 - Removed db.importAll (unsafe). Delete-all now takes a snapshot first
 - No schema/DB version change
+## 0.14.0 — Professional UI/UX redesign (interface only)
+- Design system (src/styles.css): navy/charcoal surfaces, one muted amber accent, shared spacing/radius tokens, light + dark themes, safe-area aware; button tiers: primary / secondary (default) / ghost / danger
+- Emoji removed from the whole interface and replaced by one consistent icon set (Lucide, inlined in src/Icon.tsx, no new dependency); arrows/chevrons flip automatically in RTL
+- Bottom navigation reduced from 9 to 5 items (Home, Workout, Nutrition, Progress, More) with always-visible labels; Plan, Exercises, Goals, Stats, Weight and My Data moved to a new "More" page (src/More.tsx) together with language and theme settings. No feature removed
+- New Home dashboard (src/Home.tsx): greeting, today's/next planned workout with one primary action (start / resume / create plan), weekly sessions, latest weight, today's calories, shortcuts
+- Weight tracking moved to its own page (src/Weight.tsx): value field with unit, validation message, Arabic-Indic digit input accepted, latest value + change, small trend chart, compact record list, inline delete confirmation. Entry date now uses the local date (was UTC date, which could be one day off after midnight)
+- Dashboard: removed duplicated title/nested card, segmented Overview/Coach switch, period chips wrap instead of being cut off
+- Text that referred to old tabs updated ("More → Exercises", "More → My Data")
+- Storage, IndexedDB schema (v1), backup/restore logic and all analytics are unchanged. Verified in a headless browser: add weights → export JSON → delete all → restore from file → data back
+- NOT verified: `npm run build` with Vite (no network in the authoring environment); bundled/type-checked with esbuild + tsc instead. Run `npm run build` once before deploying
+
