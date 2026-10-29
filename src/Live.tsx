@@ -100,7 +100,7 @@ export default function Live({ lang, draft, save, hist, suggest, nm, cust, onFin
         <b style={{ fontSize: '1.15rem' }}>{name(e.exId)}</b>
         {e.plan && <span className="muted">{v('plan')}: {e.plan.sets} × {e.plan.repMin}–{e.plan.repMax} · {v('rest')} {e.plan.rest}s{e.sets[0]?.pk ? ` · ${e.sets[0].pk} ${v('kg')} (${v('planned')})` : ''}</span>}
         <button className="ghost" onClick={() => setShowMedia(!showMedia)}><I n="image" /> {v('media')}</button>
-        {showMedia && <ExerciseMedia exId={e.exId} lang={lang} primary={meta ? [meta[0]] : []} secondary={meta ? meta[1].split(',').filter(Boolean) : []} />}
+        {showMedia && <ExerciseMedia exId={e.exId} lang={lang} primary={meta ? meta[0].split(',') : []} secondary={meta ? meta[1].split(',').filter(Boolean) : []} />}
         {prevE && <p className="muted"><I n="clock" /> {v('prev')} ({A_day(prevE.date)}): {prevE.e.sets.map((s: any) => `${s.reps}×${s.kg || 0}`).join(' · ')}</p>}
         {sg && !dis.includes(e.exId) && (
           <div className="sug"><span><I n="bulb" /> {v('sug')}: {sg.k === 'up' ? `${v('up')} ${sg.kg} ${v('kg')}` : sg.k === 'keep' ? `${v('keep')} ${sg.kg} ${v('kg')}` : sg.k === 'more' ? v('more') : sg.k === 'pain' ? v('painS') : v('hold')}</span>

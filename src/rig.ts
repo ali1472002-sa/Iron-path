@@ -1,7 +1,8 @@
 // Parametric stick-figure rig: each frame gives hip, torso angle and foot/hand targets; two-bone IK keeps every limb a constant length,
 // so intermediate frames are physically consistent. One source of truth for the app (SVG) and the QA renderer (scripts/render-sheet.ts).
 export type Frame = number[]; // [hx,hy,torsoDeg, f1x,f1y, f2x,f2y, h1x,h1y, h2x,h2y]
-export type Cfg = { front?: boolean; ks: number; es: number; scene: string; gear?: 'db' | 'bb'; plate?: number; cable?: [number, number]; toe?: boolean };
+export type Deco = ['l', number, number, number, number, number?] | ['r', number, number, number, number] | ['c', number, number, number];
+export type Cfg = { front?: boolean; ks: number; es: number; scene: string; gear?: 'db' | 'bb'; plate?: number; cable?: [number, number]; toe?: boolean; deco?: Deco[]; link?: [number, number, string?][] };
 export type Prim = { k: 'l'; c: string; x1: number; y1: number; x2: number; y2: number; w: number; dash?: boolean } | { k: 'c'; c: string; x: number; y: number; r: number; fill?: boolean; w?: number } | { k: 'r'; c: string; x: number; y: number; w: number; h: number };
 const L = { torso: 30, head: 10, thigh: 20, shin: 20, ua: 15, fa: 14 };
 type P = [number, number];
@@ -54,6 +55,7 @@ export function prims(frames: Frame[], t: number, cfg: Cfg, hl: { p: string[]; s
     const ft = [(J.legs[0].f[0] + J.legs[1].f[0]) / 2, (J.legs[0].f[1] + J.legs[1].f[1]) / 2] as P, v: P = [ft[0] - J.hip[0], ft[1] - J.hip[1]], n = Math.hypot(v[0], v[1]) || 1, px: P = [-v[1] / n, v[0] / n];
     out.push(seg('scene', [ft[0] + px[0] * 13 + (v[0] / n) * 3, ft[1] + px[1] * 13 + (v[1] / n) * 3], [ft[0] - px[0] * 13 + (v[0] / n) * 3, ft[1] - px[1] * 13 + (v[1] / n) * 3], 3));
   }
+  (cfg.deco ?? []).forEach((d) => { if (d[0] === 'l') out.push(seg('scene', [d[1], d[2]], [d[3], d[4]], d[5] ?? 1.8)); else if (d[0] === 'r') out.push({ k: 'r', c: 'scene', x: d[1], y: d[2], w: d[3], h: d[4] }); else out.push({ k: 'c', c: 'scene', x: d[1], y: d[2], r: d[3], fill: false, w: 1.5 }); });
   hl.s.forEach((k) => out.push(...highlight(k, J, 'hlS'))); hl.p.forEach((k) => out.push(...highlight(k, J, 'hlP')));
   const far = [1], near = [0];
   far.forEach((i) => { out.push(seg('far', J.legs[i].r, J.legs[i].k, 5.5), seg('far', J.legs[i].k, J.legs[i].f, 5.5), seg('far', J.arms[i].r, J.arms[i].e, 4.5), seg('far', J.arms[i].e, J.arms[i].h, 4.5)); });
@@ -65,6 +67,7 @@ export function prims(frames: Frame[], t: number, cfg: Cfg, hl: { p: string[]; s
     if (cfg.gear === 'bb' && a === J.arms[0]) out.push({ k: 'c', c: 'gear', x: a.h[0], y: a.h[1], r: cfg.plate ?? 8, fill: false, w: 3 }, { k: 'c', c: 'gear', x: a.h[0], y: a.h[1], r: 2, fill: true });
   });
   if (cfg.cable) out.push({ k: 'c', c: 'scene', x: cfg.cable[0], y: cfg.cable[1], r: 3, fill: false, w: 1.5 }, seg('scene', cfg.cable, J.arms[0].h, 1.2));
+  (cfg.link ?? []).forEach(([px, py, t]) => { const k = t ?? 'h0', tp = k[0] === 'f' ? J.legs[+k[1]].f : J.arms[+k[1]].h; out.push(seg('scene', [px, py], tp, 1.3), { k: 'c', c: 'scene', x: px, y: py, r: 2.2, fill: false, w: 1.3 }); });
   const pts: [string, P, P][] = [['h', J0.arms[0].h, J1.arms[0].h], ['f', J0.legs[0].f, J1.legs[0].f], ['p', J0.hip, J1.hip], ['d', J0.head, J1.head]];
   const best = pts.reduce((a, b) => (Math.hypot(b[2][0] - b[1][0], b[2][1] - b[1][1]) > Math.hypot(a[2][0] - a[1][0], a[2][1] - a[1][1]) ? b : a));
   const dx = best[2][0] - best[1][0], dy = best[2][1] - best[1][1], dl = Math.hypot(dx, dy);

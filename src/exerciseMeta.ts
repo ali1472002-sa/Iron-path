@@ -1,5 +1,6 @@
 // Extra data for each built-in exercise in exercises.ts. To add an exercise: add it there, then add its row in META.
 import { EXTRA_META, TIPS as EXTRA_TIPS } from './exercisesExtra';
+import { GYM_META, GYM_TIPS, EXTRA_LB } from './gymLib';
 export const LB: Record<string, [string, string]> = {
   calves:['السمانة','Calves'], obliques:['العضلات المائلة','Obliques'], traps:['شبه المنحرف','Trapezius'], neck:['الرقبة','Neck'], abductors:['المبعِّدات','Abductors'], adductors:['المقرِّبات','Adductors'],
   cable:['كابل','Cable'], machine:['جهاز','Machine'], band:['شريط مقاومة','Resistance band'], kettlebell:['كيتلبل','Kettlebell'], other:['أخرى','Other'],
@@ -12,6 +13,9 @@ export const LB: Record<string, [string, string]> = {
   b:['مبتدئ','Beginner'], i:['متوسط','Intermediate'], a:['متقدم','Advanced'],
 };
 export const U: Record<string, [string, string]> = {
+  muscles:['العضلات المستهدفة','Target muscles'], muscleNote:['تظليل العضلات مبسّط وغير مراجَع من مختص؛ يعتمد على بيانات التمرين في المكتبة.','Simplified muscle shading, not reviewed by a specialist; based on the exercise data in the library.'], muscleImp:['بيانات العضلات مستوردة وتحتاج إلى مراجعة قبل الاعتماد عليها.','Muscle data was imported and needs review before you rely on it.'],
+  muscleRev:['تظليل العضلات لهذه الحركة تقريبي ويحتاج إلى مراجعة مختص قبل الاعتماد عليه.','Muscle shading for this movement is approximate and needs a specialist review before you rely on it.'],
+  pat:['نمط الحركة','Movement pattern'], setup:['ضبط الجهاز ووضع الجسم','Setup and body position'], startP:['وضع البداية','Start position'], endP:['وضع النهاية','End position'], need:['المعدات المطلوبة','Equipment needed'], noMach:['إن لم يتوفر الجهاز','If the machine is not available'], doseT:['الجرعة الإرشادية حسب الهدف','Indicative dose by goal'], dStr:['قوة','Strength'], dHyp:['تضخيم','Hypertrophy'], dEnd:['تحمّل','Endurance'], sets:['مجموعات','sets'], reps:['تكرار','reps'], doseNote:['أرقام إرشادية عامة وليست وصفة؛ عدّلها حسب مستواك وتعافيك.','General guide figures, not a prescription; adjust to your level and recovery.'], uni:['أحادي الجانب: كرّر على الجانبين','Unilateral: repeat on both sides'], dataFull:['بيانات مكتملة','Complete data'], dataNoMedia:['شرح نصي مكتمل، الرسم لم يكتمل','Full text; illustration pending'], dataPart:['بيانات غير مكتملة','Incomplete data'], mediaOk:['رسم توضيحي متحرك','Animated diagram'], mediaNo:['بلا رسم','No diagram'], pt:['نمط','Pattern'], withMedia:['مع رسم فقط','With diagram only'], count:['تمرين','exercises'], clear:['مسح الفلاتر','Clear filters'], uniTag:['جانب واحد','Single side'], 
   all:['الكل','All'], rx:['الجرعة المقترحة (للتضخيم، قابلة للتعديل)','Suggested dose (hypertrophy, adjustable)'], prog:['التدرّج: عند إكمال كل المجموعات بأعلى تكرار، زد الحمل زيادة صغيرة. توقف عند الألم ولا تتمرّن رغمه.','Progression: when every set reaches the top of the range, add a small load. Stop at pain; never train through it.'], alts:['بدائل من المكتبة','Alternatives from the library'], restW:['راحة','rest'], noFig:['لا يتوفر رسم لهذا التمرين؛ اتبع الخطوات النصية.','No illustration for this exercise; follow the text steps.'], more:['عرض المزيد','Show more'],
   importEx:['استيراد تمارين (free-exercise-db JSON)','Import exercises (free-exercise-db JSON)'], importHelp:['نزّل exercises.json من مستودع yuhonas/free-exercise-db (ترخيص Unlicense) ثم اخترها هنا. الإنجليزية فقط، بدون صور.','Download exercises.json from yuhonas/free-exercise-db (Unlicense), then pick it here. English only, no images.'], repKey:['أُضيف / حُدِّث / تُجوهل / رُفض / شبه مكرر','imported / updated / skipped / rejected / near-dup'], delImp:['حذف كل التمارين المستوردة','Delete all imported exercises'], m:['العضلة','Muscle'], eq:['المعدات','Equipment'], ty:['النوع','Type'], lv:['المستوى','Level'], back:['رجوع','Back'],
   primary:['العضلات الرئيسية','Primary muscles'], secondary:['العضلات الثانوية','Secondary muscles'], steps:['خطوات الأداء','How to perform'],
@@ -42,5 +46,6 @@ export const POSE: Record<string, [string, string][]> = {
   plank:[['تنفس بانتظام ولا تحبس النفس.','Breathe steadily; do not hold your breath.'],['ارتفاع الورك أو هبوطه|حبس النفس','Hips rising or dropping|Holding your breath'],['توقف عند ألم أسفل الظهر وقصّر مدة التثبيت.','Stop at lower-back pain and shorten the hold.']],
 };
 
-Object.assign(META, EXTRA_META);
-export const TIPS = EXTRA_TIPS;
+Object.assign(META, EXTRA_META, GYM_META);
+Object.assign(LB, EXTRA_LB);
+export const TIPS = { ...EXTRA_TIPS, ...GYM_TIPS };

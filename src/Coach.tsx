@@ -78,7 +78,7 @@ export default function Coach({ lang }: { lang: Lang }) {
   const exName = (id: string) => { const b = (EXERCISES as any[]).find((e) => e.id === id); return b ? b[lang] : cust.find((c) => c.id === id)?.name ?? id; };
   const mapEx = (id: string): C.Map | null => {
     const b = (EXERCISES as any[]).find((e) => e.id === id);
-    if (b && META[id]) return { g: b.m, pm: META[id][0], sm: META[id][1].split(',').filter(Boolean) };
+    if (b && META[id]) return { g: b.m, pm: META[id][0].split(',')[0], sm: META[id][1].split(',').filter(Boolean) };
     const c = cust.find((x) => x.id === id);
     if (!c) return null;
     return { g: c.muscle, pm: c.ref ? c.pm : undefined, sm: c.ref ? (c.sm ?? '').split(',').filter(Boolean) : [] };

@@ -7,7 +7,7 @@ export type Day = { id: string; name: [string, string]; weekday: number; items: 
 export type Plan = { id: string; name: string; createdAt: string; profile: Profile; days: Day[]; notes: string[] };
 
 export const DEFAULT: Profile = { goal: 'gen', level: 'b', days: 3, dur: 45, equip: 'bw', split: 'auto', prio: [], avoid: [] };
-const ALLOWED: Record<string, string[]> = { gym: ['bodyweight', 'dumbbell', 'barbell', 'bar', 'cable', 'machine', 'band'], db: ['bodyweight', 'dumbbell'], band: ['bodyweight', 'band'], bw: ['bodyweight'] };
+const ALLOWED: Record<string, string[]> = { gym: ['bodyweight', 'dumbbell', 'barbell', 'bar', 'cable', 'machine', 'smith', 'band'], db: ['bodyweight', 'dumbbell'], band: ['bodyweight', 'band'], bw: ['bodyweight'] };
 const RANK: Record<string, number> = { b: 0, i: 1, a: 2 };
 const TYPES: Record<string, { n: [string, string]; g: string[] }> = {
   full: { n: ['جسم كامل', 'Full body'], g: ['legs', 'back', 'chest', 'shoulders', 'core', 'arms'] },
