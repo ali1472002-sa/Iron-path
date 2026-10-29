@@ -34,3 +34,7 @@ Bundled reference data lives in code (exercises.ts, exercisesExtra.ts, foodData.
 | Text-only fallback | 6 | kneepush, dbfly, crunch, russian, bandpull, catcow (a side-view stick figure cannot show them accurately) |
 
 Third-party exercise media (free-exercise-db images, wger, ExerciseDB, YouTube/brand videos) are **not** bundled: image provenance/redistribution was not independently verified in this environment. To add media later: put the file in public/media/, add an entry (source + license) in src/media.ts, and run scripts/check-media.ts.
+
+## Gym exercise library (0.15.0)
+Texts and diagrams of the 47 gym exercises were written/drawn for this project from general strength-training knowledge. They are NOT reviewed by a coach or clinician. Dose figures are indicative ranges only. No third-party image, video or text is bundled.
+

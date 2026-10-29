@@ -35,3 +35,11 @@ backup.ts (format 2, validation, planRestore — pure, tested), backupStore.ts (
 ## UI redesign (0.14.0)
 Navigation: 5 bottom tabs (home, wk, nu, db) + `more`; sub-pages reached from More (pl, lib, gl, st, weight, data) show a back button. State type `Tab` and `MORE_TABS` live in src/App.tsx. Icons: `<I n="name" />` from src/Icon.tsx (add new Lucide paths there; never use emoji as UI icons). Styling: tokens in src/styles.css (:root / [data-theme=dark]); default `button` is secondary, add `className="primary"` for the single main action, `ghost` for light actions. New files: Home.tsx, Weight.tsx, More.tsx, Icon.tsx. Weight records still live in store `measurements` ({id,date,weightKg}).
 
+## Exercise library architecture (0.15.0)
+Adding an exercise = add ONE object to ROWS1/ROWS2 (src/gymRows1.ts / gymRows2.ts): id (never change an existing id), ar/en, m (muscle group), eq, ty, lv, pm/sm (muscle keys from LB), pat (key of PAT in gymLib.ts), nd/su/a/z/b/x/w ([ar,en] texts), s (steps, "|" separated, [ar,en]), al (alternative ids). gymLib.ts merges rows into EXERCISES / META / TIPS / DETAIL automatically. Older exercises keep their entries in exercises.ts / exercisesExtra.ts / exerciseMeta.ts; their extra details live in DETAIL (gymLib.ts). Diagram: add frames to GYM_MEDIA in src/gymMedia.ts (frame = [hipX,hipY,torsoDeg,foot1,foot2,hand1,hand2]; `deco` draws pads/rails, `link` draws cables/levers). No diagram = shown as "diagram pending". Never add a video/image entry unless the file exists and its licence is recorded.
+
+## Anatomy + custom animated views (0.16.0)
+- Muscle map: src/Anatomy.tsx draws front/back shapes keyed by the muscle keys of META/LB. To support a new muscle: add its key to LB (exerciseMeta/gymLib EXTRA_LB), add a shape to FRONT and/or BACK and to FRONT_ONLY/BACK_ONLY. Colours: --acc (primary), --sec (secondary).
+- Custom animated scenes: add a component to CUSTOM in src/customViews.tsx (receives t in 0..1 and lang), then register `{ kind:'custom', view:'<name>', caption, source, license, period? }` in gymMedia.ts / media.ts. ExerciseMedia.tsx provides play / pause / restart / start-mid-end for every media kind.
+- Primary muscles: META[id][0] may be comma separated; code that needs one key uses split(',')[0].
+

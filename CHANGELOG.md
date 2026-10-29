@@ -95,3 +95,23 @@
 - Storage, IndexedDB schema (v1), backup/restore logic and all analytics are unchanged. Verified in a headless browser: add weights → export JSON → delete all → restore from file → data back
 - NOT verified: `npm run build` with Vite (no network in the authoring environment); bundled/type-checked with esbuild + tsc instead. Run `npm run build` once before deploying
 
+## 0.15.0 — Professional gym exercise library (30 -> 77 exercises)
+- 47 new gym exercises (machines, cable, Smith machine, free-weight basics) in src/gymRows1.ts + src/gymRows2.ts; one object per exercise with bilingual name, primary/secondary muscles, equipment, level, movement pattern, equipment needed, setup, start/end position, numbered steps, breathing, mistakes, safety and "if the machine is not available" alternatives
+- All 30 original exercises keep their ids, muscle, metadata, steps and diagrams (verified by script); 6 display names clarified (e.g. "Dumbbell overhead press", "Bodyweight squat"); movement pattern, setup, start/end and equipment-needed added to all of them (src/gymLib.ts overlay)
+- 45 new original diagrams (src/gymMedia.ts) drawn with the existing rig; rig.ts gained scene decoration (`deco`) and machine/cable links (`link`) so machines, pads, rails and cables are drawn. Machine shapes are approximate and labelled as such. No external video or image is bundled, no link is invented. Diagram pending: Dumbbell shrug, Pallof press (plus 6 older exercises that never had one)
+- Library UI: filters for muscle, equipment (incl. Smith machine), movement pattern, level, favourites and "with diagram only"; Arabic/English search also matches equipment and pattern names; result count and clear-filters; structured detail page (status badge, media with source/licence, muscles, equipment needed, setup, start/end positions, numbered steps, breathing, mistakes, safety, indicative dose by goal, alternatives)
+- Data-status badge: "complete data" / "full text, diagram pending" / "incomplete data"
+- Plan generator: Smith machine counts as gym equipment. Generated plans for the "gym" setting stay complete (0 empty days in 960 profile combinations); other equipment settings behave exactly as before
+- Storage schema, backup/restore and existing plans/sessions untouched. Verified: log a session with a new machine exercise -> saved, survives reload, shows in progress and coach
+- NOT verified: `npm run build` with Vite (no network where this was authored); bundled with esbuild and type-checked with tsc instead
+
+## 0.16.0 — Anatomical muscle map + animated demonstrations (Pallof Press prototype first)
+- New simplified anatomy map (src/Anatomy.tsx): front and back figures, primary muscles in the accent colour, secondary muscles in a second colour, neutral for muscles not involved; muscle names in Arabic and English; only the view(s) that contain highlighted muscles are shown. Shading is generated from each exercise's own META data (primary/secondary muscle keys), so every one of the 77 exercises gets its own map; nothing is coloured just because it is near the movement
+- META primary muscle may now list several keys ("obliques,tva"); new key `tva` (transverse abdominis, deep core) drawn as a dashed band because it is not a surface muscle. Coach still uses the first key
+- Pallof press (src/customViews.tsx): hand-built animated TOP view — person standing side-on to the cable stack, cable anchor and pull direction, hands moving from the chest to full extension, fixed spine reference line and "torso stays square" caption; trunk tinted, muscles shown in the map (obliques + deep core primary; rectus abdominis, lower back, glutes, deltoids secondary) so it is not presented as isolating one muscle. A side-view stick figure cannot show anti-rotation, hence the custom scene (new media kind "custom")
+- Playback: easing with a short hold at both ends, play / pause / restart, and static start / middle / end positions for every animated exercise; secondary-muscle colour now consistent between the stick-figure highlight and the anatomy map
+- Exercises with diagram + motion: 70 of 77 (69 stick-figure animations + Pallof). Without any diagram: dumbbell shrug, knee push-up, dumbbell fly, crunch, Russian twist, band pull-apart, cat-cow
+- Muscle shading flagged "needs specialist review" for jacks, cat-cow and bodyweight hip thrust; imported exercises are flagged the same way. Nothing is claimed to be reviewed by a coach or clinician
+- scripts/check-media.ts understands the custom kind (run: tsx scripts/check-media.ts -> 0 errors)
+- NOT verified: `npm run build` with Vite (no network where this was authored) and Safari on a physical iPhone; checked with esbuild bundle, tsc and headless Chromium at iPhone size
+
