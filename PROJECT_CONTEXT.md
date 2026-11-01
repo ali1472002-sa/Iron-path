@@ -43,3 +43,6 @@ Adding an exercise = add ONE object to ROWS1/ROWS2 (src/gymRows1.ts / gymRows2.t
 - Custom animated scenes: add a component to CUSTOM in src/customViews.tsx (receives t in 0..1 and lang), then register `{ kind:'custom', view:'<name>', caption, source, license, period? }` in gymMedia.ts / media.ts. ExerciseMedia.tsx provides play / pause / restart / start-mid-end for every media kind.
 - Primary muscles: META[id][0] may be comma separated; code that needs one key uses split(',')[0].
 
+## Figure renderer (0.17.0)
+Stick-figure frames (gymMedia.ts / media.ts) are drawn by src/Mannequin.tsx from rig.solve(). To add a muscle overlay: extend the `overlays` block in Mannequin.tsx (side view = torsoBand/limb overlays, front view = frontBand). Colours come from CSS variables --bm-* (body) and --mp / --ms (primary / secondary muscles). ExerciseMedia.tsx auto-fits the viewBox (fitBox). Do not reintroduce emoji or external image URLs.
+

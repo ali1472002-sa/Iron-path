@@ -115,3 +115,10 @@
 - scripts/check-media.ts understands the custom kind (run: tsx scripts/check-media.ts -> 0 errors)
 - NOT verified: `npm run build` with Vite (no network where this was authored) and Safari on a physical iPhone; checked with esbuild bundle, tsc and headless Chromium at iPhone size
 
+## 0.17.0 — Muscular, shaded figure with painted target muscles
+- New renderer src/Mannequin.tsx replaces the stick figure in every stick-figure animation (69 exercises): tapered shaded limbs, torso with chest/back contour, head, hands, feet, in side view or front view, drawn on the same rig skeleton so the motion is unchanged
+- Target muscles are painted on the body part where they really are: biceps/hamstrings/calves on the flexor side of the bend, triceps/quads on the opposite side, pecs/abs on the front of the torso, lats/upper back/lower back/traps on the back, glutes at the hip, deltoids at the shoulder, deep core as a dashed band. Primary muscles red, secondary orange; same colours in the anatomy map and the Pallof view (new CSS variables --mp / --ms)
+- Auto-zoom per exercise so the figure and its equipment fill the card
+- Honest limits: this is an original drawn figure, not a photographic or 3D render; machine shapes are approximate; muscle shading is not reviewed by a specialist. The media system still accepts licensed images/video later (kinds 'anim' / 'video')
+- Verified in headless Chromium at iPhone size (Arabic RTL and English LTR, dark and light): media check 0 errors, data audit 0 problems, old ids preserved, backup -> delete -> restore, session logging. NOT verified: Vite `npm run build` and Safari on a physical iPhone
+
