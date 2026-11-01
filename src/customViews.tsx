@@ -38,7 +38,7 @@ function Pallof({ t, lang }: { t: number; lang: Lang }) {
       {/* feet */}
       <ellipse cx="52" cy="92" rx="3" ry="6" fill="currentColor" opacity="0.35" /><ellipse cx="64" cy="92" rx="3" ry="6" fill="currentColor" opacity="0.35" />
       {/* torso (core highlighted: it must stay still) */}
-      <rect x="44" y="58" width="28" height="26" rx="10" fill="var(--acc)" opacity="0.32" />
+      <rect x="44" y="58" width="28" height="26" rx="10" fill="var(--mp)" opacity="0.38" />
       <rect x="44" y="58" width="28" height="26" rx="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="58" cy="62" r="6.5" fill="var(--card)" stroke="currentColor" strokeWidth="1.5" />
       {/* arms */}

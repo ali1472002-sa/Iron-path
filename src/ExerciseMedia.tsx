@@ -1,7 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Lang } from './i18n';
 import { MEDIA } from './media';
-import { Prim, prims } from './rig';
+import { Prim, prims, frameAt } from './rig';
+import { Mannequin } from './Mannequin';
+import { solve } from './rig';
+
+// zoom to the figure + equipment of this exercise so it fills the card (bbox over both end positions, never smaller than a minimum width)
+function fitBox(m: any): string {
+  const xs: number[] = [], ys: number[] = [];
+  const take = (p: number[]) => { xs.push(p[0]); ys.push(p[1]); };
+  (m.frames as number[][]).forEach((fr) => { const J = solve(fr, m.cfg); [J.hip, J.neck, J.head, ...J.legs.flatMap((l: any) => [l.k, l.f]), ...J.arms.flatMap((a: any) => [a.e, a.h])].forEach(take); take([J.head[0], J.head[1] - 7]); });
+  const c = m.cfg; if (c.cable) take(c.cable); (c.link ?? []).forEach((l: any) => take([l[0], l[1]]));
+  (c.deco ?? []).forEach((d: any) => { if (d[0] === 'l') { take([d[1], d[2]]); take([d[3], d[4]]); } else if (d[0] === 'r') { take([d[1], d[2]]); take([d[1] + d[3], d[2] + d[4]]); } else take([d[1], d[2]]); });
+  take([50, 93]);
+  const pad = 11; let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  let w = Math.max(x1 - x0, 62), h = Math.max(y1 - y0, 70); const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  w = Math.max(w, h * 0.9); h = Math.max(h, w * 0.7);
+  return `${(cx - w / 2).toFixed(1)} ${(cy - h / 2).toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`;
+}
 import { I } from './Icon';
 import { CUSTOM } from './customViews';
 
@@ -26,6 +42,18 @@ const el = (p: Prim, k: number) => {
   const col = p.c === 'hlP' ? 'var(--acc)' : p.c === 'hlS' ? 'var(--sec)' : p.c === 'gear' ? 'var(--acc)' : 'currentColor';
   return <circle key={k} cx={p.x} cy={p.y} r={p.r} fill={p.fill ? col : 'none'} stroke={p.fill ? 'none' : col} strokeWidth={p.w ?? 1.5} opacity={p.c === 'hlS' ? 0.7 : p.c === 'hlP' ? 0.9 : p.c === 'scene' ? 0.5 : 1} />;
 };
+
+// scene (floor, bench, machine, cable) -> shaded mannequin with painted target muscles -> gear and movement arrow on top
+function FramesScene({ m, t, primary, secondary }: { m: any; t: number; primary: string[]; secondary: string[] }) {
+  const all = prims(m.frames, t, m.cfg, { p: [], s: [] });
+  return (
+    <>
+      {all.filter((p) => p.c === 'scene').map(el)}
+      <Mannequin f={frameAt(m.frames, t)} cfg={m.cfg} hl={{ p: primary, s: secondary }} />
+      {all.filter((p) => p.c === 'gear' || p.c === 'arrow').map(el)}
+    </>
+  );
+}
 
 export default function ExerciseMedia({ exId, lang, primary, secondary }: { exId: string; lang: Lang; primary: string[]; secondary: string[] }) {
   const i = lang === 'ar' ? 0 : 1, x = (k: string) => X[k][i];
@@ -57,7 +85,7 @@ export default function ExerciseMedia({ exId, lang, primary, secondary }: { exId
   const label = n === 1 ? '' : x(['start', 'mid', 'end'][idx]);
   return (
     <div>
-      <svg viewBox={Custom ? '0 0 100 102' : '0 -12 100 112'} className="fig" role="img" aria-label={m.caption[i]} style={{ maxHeight: 340 }}>{Custom ? <Custom t={t} lang={lang} /> : m.kind === 'frames' ? prims(m.frames, t, m.cfg, { p: primary, s: secondary }).map(el) : null}</svg>
+      <svg viewBox={Custom ? '0 0 100 102' : m.kind === 'frames' ? fitBox(m) : '0 -12 100 112'} className="fig" role="img" aria-label={m.caption[i]} style={{ maxHeight: 340 }}>{Custom ? <Custom t={t} lang={lang} /> : m.kind === 'frames' ? <FramesScene m={m} t={t} primary={primary} secondary={secondary} /> : null}</svg>
       {n > 1 && (
         <div className="row" style={{ alignItems: 'center', justifyContent: 'center' }}>
           <button className="ghost" aria-label={x('prev')} onClick={() => { setPlaying(false); setIdx((idx + 2) % 3); }}><I n="chevl" /></button>

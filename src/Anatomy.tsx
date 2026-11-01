@@ -63,13 +63,13 @@ function View({ reg, pri, sec, back }: { reg: Record<string, Sh[]>; pri: Set<str
     <svg viewBox="0 0 120 232" className="mmsvg" aria-hidden="true">
       <Body />
       {order.map((k) => reg[k].map((s, n) => {
-        const on = pri.has(k) ? 'var(--acc)' : sec.has(k) ? 'var(--sec)' : 'var(--mm-idle)';
+        const on = pri.has(k) ? 'var(--mp)' : sec.has(k) ? 'var(--ms)' : 'var(--mm-idle)';
         return <Shape key={k + n} s={s} fill={on} op={pri.has(k) || sec.has(k) ? 0.95 : 0.7} />;
       }))}
       {!back && (pri.has('abs') || sec.has('abs')) && [72, 82, 92].map((y) => <line key={y} x1="54" x2="66" y1={y} y2={y} stroke="var(--card)" strokeWidth="0.9" />)}
       {!back && deep && (
-        <g><rect x="44" y="80" width="32" height="22" rx="8" fill={pri.has('tva') ? 'var(--acc)' : 'var(--sec)'} opacity="0.42" />
-          <rect x="44" y="80" width="32" height="22" rx="8" fill="none" stroke={pri.has('tva') ? 'var(--acc)' : 'var(--sec)'} strokeWidth="1.3" strokeDasharray="3 2" /></g>
+        <g><rect x="44" y="80" width="32" height="22" rx="8" fill={pri.has('tva') ? 'var(--mp)' : 'var(--ms)'} opacity="0.42" />
+          <rect x="44" y="80" width="32" height="22" rx="8" fill="none" stroke={pri.has('tva') ? 'var(--mp)' : 'var(--ms)'} strokeWidth="1.3" strokeDasharray="3 2" /></g>
       )}
     </svg>
   );
@@ -90,8 +90,8 @@ export default function MuscleMap({ lang, primary, secondary }: { lang: Lang; pr
         {showB && <figure><View reg={BACK} pri={pri} sec={sec} back={true} /><figcaption>{T.b}</figcaption></figure>}
       </div>
       <ul className="mmleg" aria-label="muscles">
-        {[...pri].map((k) => <li key={k}><i style={{ background: 'var(--acc)' }} /><b>{T.p}</b> {nm(k)}</li>)}
-        {[...sec].map((k) => <li key={k}><i style={{ background: 'var(--sec)' }} /><b>{T.s}</b> {nm(k)}</li>)}
+        {[...pri].map((k) => <li key={k}><i style={{ background: 'var(--mp)' }} /><b>{T.p}</b> {nm(k)}</li>)}
+        {[...sec].map((k) => <li key={k}><i style={{ background: 'var(--ms)' }} /><b>{T.s}</b> {nm(k)}</li>)}
       </ul>
       {all.includes('tva') && <p className="muted">{T.deep}</p>}
     </div>

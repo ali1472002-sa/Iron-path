@@ -174,8 +174,8 @@ li.ex{padding:0;border-bottom:0}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
 
 /* anatomy map */
-:root{--sec:#2f7fc0;--mm-body:#e9edf3;--mm-line:rgba(15,23,42,.28);--mm-idle:#cfd6e0}
-[data-theme=dark]{--sec:#5aa9e6;--mm-body:#25314a;--mm-line:rgba(255,255,255,.22);--mm-idle:#33415f}
+:root{--mp:#d93b25;--ms:#e8962a;--sec:var(--ms);--mm-body:#e9edf3;--mm-line:rgba(15,23,42,.28);--mm-idle:#cfd6e0;--bm-base:#aeb7c6;--bm-shade:#8d97a8;--bm-lite:#e3e8f0;--bm-line:#5d6779;--bm-far:#8a94a6}
+[data-theme=dark]{--mp:#ef5b45;--ms:#f4b04a;--mm-body:#25314a;--mm-line:rgba(255,255,255,.22);--mm-idle:#33415f;--bm-base:#8f9bb0;--bm-shade:#6c778c;--bm-lite:#c3cbda;--bm-line:#3e4860;--bm-far:#5d687d}
 .mm{display:flex;flex-direction:column;gap:10px}
 .mmrow{display:flex;justify-content:center;gap:8px}
 .mmrow figure{margin:0;flex:0 1 190px;text-align:center}
