@@ -122,3 +122,9 @@
 - Honest limits: this is an original drawn figure, not a photographic or 3D render; machine shapes are approximate; muscle shading is not reviewed by a specialist. The media system still accepts licensed images/video later (kinds 'anim' / 'video')
 - Verified in headless Chromium at iPhone size (Arabic RTL and English LTR, dark and light): media check 0 errors, data audit 0 problems, old ids preserved, backup -> delete -> restore, session logging. NOT verified: Vite `npm run build` and Safari on a physical iPhone
 
+## 0.18.0 — Phase 1: data safety and testing foundation (no feature or UI change)
+- 78 automated tests (Vitest-style, tests/): database, CRUD, invalid data, backup format/checksum/validation, old backups, restore round trip, rollback on failure, safety snapshots, migrations, number/date validation. `npm test` needs `npm install` first (adds vitest and fake-indexeddb as devDependencies)
+- Defects proven and fixed: sticky failed DB open, backup format not checked, impossible weights/dates/food/water accepted on import, snapshot id collision, leaked safety-DB connections, Infinity/negative set values, CSV NaN. DB_VERSION is still 1 and no data migration was run
+- New src/schema.ts, src/migrations.ts (testable migration steps), src/validate.ts; docs/MIGRATION_PLAN.md; docs/PHASE1_REPORT.md
+- NOT verified: `npm run build`, real Vitest run, iPhone (see docs/PHASE1_REPORT.md)
+

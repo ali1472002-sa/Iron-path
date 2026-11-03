@@ -46,3 +46,6 @@ Adding an exercise = add ONE object to ROWS1/ROWS2 (src/gymRows1.ts / gymRows2.t
 ## Figure renderer (0.17.0)
 Stick-figure frames (gymMedia.ts / media.ts) are drawn by src/Mannequin.tsx from rig.solve(). To add a muscle overlay: extend the `overlays` block in Mannequin.tsx (side view = torsoBand/limb overlays, front view = frontBand). Colours come from CSS variables --bm-* (body) and --mp / --ms (primary / secondary muscles). ExerciseMedia.tsx auto-fits the viewBox (fitBox). Do not reintroduce emoji or external image URLs.
 
+## Data safety (0.18.0)
+DB name/version/stores live in src/schema.ts. Schema changes go through src/migrations.ts (+ test) and only then DB_VERSION; backup layout changes go through FORMAT_STEPS in src/backup.ts. See docs/MIGRATION_PLAN.md. Never write user numbers to the database without toNum()/safeNonNeg() from src/validate.ts. Run `npm test` before every release that touches db/backup code.
+
