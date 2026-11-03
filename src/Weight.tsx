@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Lang, t } from './i18n';
 import * as db from './db';
 import { I } from './Icon';
+import { toNum } from './validate';
 
 type Meas = { id: string; date: string; weightKg: number };
 // accepts Arabic-Indic digits and decimal separators typed on an Arabic keyboard
-const norm = (s: string) => s.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[٫,،]/g, '.').trim();
 
 function Spark({ pts }: { pts: Meas[] }) {
   const asc = [...pts].reverse().slice(-30);
@@ -32,8 +32,8 @@ export default function Weight({ lang, meas, reload }: { lang: Lang; meas: Meas[
   const [all, setAll] = useState(false);
 
   const add = async () => {
-    const v = parseFloat(norm(w));
-    if (!(v > 20 && v < 400)) { setErr(T('badW')); return; }
+    const v = toNum(w);
+    if (v == null || !(v > 20 && v < 400)) { setErr(T('badW')); return; }
     await db.put('measurements', { id: crypto.randomUUID(), date: new Date().toLocaleDateString('sv'), weightKg: Math.round(v * 10) / 10 });
     setW(''); setErr(''); reload();
   };

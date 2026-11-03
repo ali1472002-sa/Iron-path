@@ -6,6 +6,7 @@ import { normText } from './refdata';
 import { ACT, Macros, NProfile, P0, estimate, validate } from './nutri';
 import * as db from './db';
 import { I } from './Icon';
+import { toNum, safeNonNeg } from './validate';
 
 const N: Record<string, [string, string]> = {
   day:['اليوم','Day'], prog:['التقدم','Progress'], foods:['الأطعمة','Foods'], prof:['الملف','Profile'],
@@ -98,7 +99,7 @@ export default function Nutrition({ lang }: { lang: Lang }) {
 
   const tabs = <div className="chips">{(['day', 'prog', 'foods', 'prof'] as const).map((v) => <button key={v} className={'chip' + (view === v ? ' on' : '')} onClick={() => { setView(v); setMsg(''); setAdding(''); }}>{n(v)}</button>)}</div>;
   const err = msg && <p className="warn">{msg}</p>;
-  const num = (k: 'age' | 'h' | 'w', label: string) => <label>{label}<input inputMode="decimal" value={prof[k] ?? ''} onChange={(e) => setProf({ ...prof, [k]: e.target.value === '' ? undefined : +e.target.value })} /></label>;
+  const num = (k: 'age' | 'h' | 'w', label: string) => <label>{label}<input inputMode="decimal" value={prof[k] ?? ''} onChange={(e) => { const v = toNum(e.target.value); setProf({ ...prof, [k]: e.target.value === '' ? undefined : v != null && v >= 0 && v <= 1000 ? v : prof[k] }); }} /></label>;
 
   if (view === 'prof') {
     const save = () => { const b = validate(prof); if (b) { setMsg(n('bad') + n(b)); return; } run(async () => { await db.put('nutrition', { id: 'profile', profile: prof }); setMsg(n('saved2')); }); };
@@ -121,7 +122,7 @@ export default function Nutrition({ lang }: { lang: Lang }) {
             {est.floored && <p className="muted">{n('floor')}</p>}{est.minor && <p className="warn">{n('minor')}</p>}</div>)}
         {est && (prof.manual ? (
           <div className="ent"><b>{n('manual')}</b>
-            {(['k', 'p', 'c', 'f'] as const).map((k) => <label key={k}>{n(k === 'k' ? 'kcal' : k)}<input inputMode="numeric" value={prof.manual![k]} onChange={(e) => setProf({ ...prof, manual: { ...prof.manual!, [k]: +e.target.value || 0 } })} /></label>)}
+            {(['k', 'p', 'c', 'f'] as const).map((k) => <label key={k}>{n(k === 'k' ? 'kcal' : k)}<input inputMode="numeric" value={prof.manual![k]} onChange={(e) => setProf({ ...prof, manual: { ...prof.manual!, [k]: safeNonNeg(e.target.value, 20000) } })} /></label>)}
             <button className="ghost" onClick={() => setProf({ ...prof, manual: null })}>{n('reset')}</button></div>
         ) : <button className="ghost" onClick={() => setProf({ ...prof, manual: { k: est.k, p: est.p, c: est.c, f: est.f } })}><I n="edit" /> {n('manual')}</button>)}
       </section>

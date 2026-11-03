@@ -7,6 +7,7 @@ import { Goal, R0, Rem, achievements, due, newlyUnlocked, progress, weekOf } fro
 import { t } from './i18n';
 import * as db from './db';
 import { I } from './Icon';
+import { safeNonNeg, LIMITS } from './validate';
 
 const G: Record<string, [string, string]> = {
   title:['الأهداف والإنجازات','Goals & achievements'], week:['الأسبوع','Week'], ach:['الإنجازات','Achievements'], rem:['التذكيرات','Reminders'],
@@ -135,7 +136,7 @@ export default function Goals({ lang }: { lang: Lang }) {
         <div className="ent"><b><I n="drop" /> {g('cups')}: {S.cups} / {R.waterTarget}</b>
           <div className="row"><button className="ghost" onClick={() => put('nutrition', { id: 'water:' + today, date: today, cups: Math.max(0, S.cups - 1) })}>−</button>
             <button onClick={() => put('nutrition', { id: 'water:' + today, date: today, cups: S.cups + 1 })}>+ <I n="drop" /></button></div>
-          <label>{g('cupT')}<input inputMode="numeric" value={R.waterTarget} onChange={(e) => sv({ waterTarget: Math.max(1, +e.target.value || 1) })} /></label></div>
+          <label>{g('cupT')}<input inputMode="numeric" value={R.waterTarget} onChange={(e) => sv({ waterTarget: Math.min(LIMITS.waterTarget, Math.max(1, safeNonNeg(e.target.value, LIMITS.waterTarget) || 1)) })} /></label></div>
         <button className="ghost" onClick={() => confirm(g('confReset')) && put('plans', { ...R0, lastBackup: R.lastBackup })}>{g('reset')}</button>
       </section>);
   }

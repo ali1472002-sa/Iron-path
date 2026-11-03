@@ -4,7 +4,7 @@ export type Ent = { exId: string; sets: SetR[]; pain?: boolean };
 export type Session = { id: string; date: string; entries: Ent[]; planId?: string; dayId?: string };
 export type Kind = 'week' | 'month' | '7' | '30' | '90';
 export type Range = [string, string];
-const num = (x: any) => +x || 0;
+const num = (x: any) => { const n = +x; return Number.isFinite(n) && n > 0 ? n : 0; }; // NaN, Infinity and negatives never reach the volume maths
 export const ld = (d: Date) => d.toLocaleDateString('sv');
 export const dayOf = (iso: string) => ld(new Date(iso));
 export const addDays = (s: string, n: number) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return ld(d); };

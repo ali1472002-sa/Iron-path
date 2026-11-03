@@ -4,6 +4,7 @@ import { CATS, FoodRec, RECIPES } from './foodDb';
 import { fromFdc, normText, reconcile, Report } from './refdata';
 import * as db from './db';
 import { I } from './Icon';
+import { safeNonNeg } from './validate';
 
 const F: Record<string, [string, string]> = {
   search:['ابحث بالعربية أو الإنجليزية…','Search in Arabic or English…'], all:['الكل','All'], mine:['أطعمتي','Mine'], imp:['مستورد','Imported'], more:['عرض المزيد','Show more'],
@@ -37,7 +38,7 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
 
   const saveCf = () => {
     const nums = [cf.k, cf.p, cf.c, cf.f, cf.g].map(num), fi = cf.fi === '' ? null : num(cf.fi);
-    if (!cf.name.trim() || nums.some((x) => isNaN(x) || x < 0) || !(nums[4] > 0) || (fi != null && (isNaN(fi) || fi < 0))) { setMsg(f('bad')); return; }
+    if (!cf.name.trim() || nums.some((x) => !Number.isFinite(x) || x < 0) || !(nums[4] > 0) || (fi != null && (!Number.isFinite(fi) || fi < 0))) { setMsg(f('bad')); return; }
     run(async () => { await db.put('nutrition', { ...(cf.rec ?? {}), id: cf.id ?? 'food:' + crypto.randomUUID(), name: cf.name.trim(), cat: cf.cat, g: nums[4], per: { k: nums[0], p: nums[1], c: nums[2], f: nums[3], fi } }); setCf(null); setMsg(''); });
   };
   const rcTotals = (ings: { id: string; g: number }[], finalG: number) => {
@@ -48,7 +49,7 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
     return { per, sum, w };
   };
   const saveRecipe = (name: string, ings: { id: string; g: number }[], finalG: number, servings: number) => {
-    if (!name.trim() || !ings.length || ings.some((x) => !(x.g > 0))) { setMsg(f('bad')); return; }
+    if (!name.trim() || !ings.length || ings.some((x) => !(x.g > 0 && Number.isFinite(x.g)))) { setMsg(f('bad')); return; }
     const { per, w } = rcTotals(ings, finalG);
     run(async () => { await db.put('nutrition', { id: 'food:' + crypto.randomUUID(), name: name.trim(), cat: 'dish', g: Math.round(w / Math.max(1, servings)), per, recipe: { ingredients: ings.map((x) => ({ id: x.id, name: byId(x.id)!.name, g: x.g })), finalG: w, servings } }); setRc(null); setMsg(''); });
   };
@@ -95,7 +96,7 @@ export default function FoodsPanel({ lang, tabs, foods, customs, meals, reload }
           <input placeholder={f('name')} value={rc.name} onChange={(e) => setRc({ ...rc, name: e.target.value })} />
           {rc.ings.map((x: any, k: number) => (
             <div key={k} className="row srow"><span style={{ flex: 1 }}>{byId(x.id)?.name}</span>
-              <input style={{ maxWidth: 80 }} inputMode="decimal" value={x.g} onChange={(e) => setRc({ ...rc, ings: rc.ings.map((y: any, j: number) => (j === k ? { ...y, g: +e.target.value || 0 } : y)) })} />
+              <input style={{ maxWidth: 80 }} inputMode="decimal" value={x.g} onChange={(e) => setRc({ ...rc, ings: rc.ings.map((y: any, j: number) => (j === k ? { ...y, g: safeNonNeg(e.target.value, 100000) } : y)) })} />
               <button className="ghost" onClick={() => setRc({ ...rc, ings: rc.ings.filter((_: any, j: number) => j !== k) })}><I n="x" /></button></div>))}
           <select value={pick} onChange={(e) => { const fd = byId(e.target.value); if (fd) setRc({ ...rc, ings: [...rc.ings, { id: fd.id, g: fd.g }] }); setPick(''); }}>
             <option value=""><I n="plus" /> {f('ing')}</option>{foods.slice(0, 400).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>

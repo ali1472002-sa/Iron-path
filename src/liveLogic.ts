@@ -1,5 +1,6 @@
 // Pure logic for the live workout screen. All timing uses timestamps (ms since epoch) stored in the draft, so it survives reloads and suspension.
 import * as A from './analytics';
+import { toNum, safeNonNeg, LIMITS } from './validate';
 export type Rest = { end?: number; left?: number; total: number; done?: boolean; bySession?: boolean };
 const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 export const restLeft = (r: Rest | undefined, now: number) => (!r || r.done ? 0 : r.end != null ? Math.max(0, Math.ceil((r.end - now) / 1000)) : Math.ceil((r.left ?? 0) / 1000));
@@ -21,10 +22,13 @@ export function resumeSession(d: any, now: number) {
   return x.rest?.bySession ? resumeRest(x, now) : x;
 }
 // Idempotent: completing an already-completed set returns the same draft (no second timer, no duplicate record).
+// Typed set values are kept as strings; garbage (letters, negatives, Infinity, absurd sizes) is normalised when the set is completed.
+const cleanSetNum = (v: any, max: number) => { if (v === '' || v == null) return v; const n = toNum(v); return n != null && n >= 0 && n <= max ? v : String(safeNonNeg(v, max)); };
 export function completeSet(d: any, ei: number, si: number, now: number) {
   const s = d.entries[ei]?.sets[si];
   if (!s || s.done || d.pausedAt) return d;
   const c = JSON.parse(JSON.stringify(d));
+  c.entries[ei].sets[si].kg = cleanSetNum(c.entries[ei].sets[si].kg, LIMITS.setKg); c.entries[ei].sets[si].reps = cleanSetNum(c.entries[ei].sets[si].reps, LIMITS.setReps);
   c.entries[ei].sets[si].done = true; c.entries[ei].sets[si].at = now;
   if (c.autoRest !== false) { const sec = c.entries[ei].plan?.rest ?? 90; c.rest = { end: now + sec * 1000, total: sec }; }
   return c;

@@ -1,6 +1,14 @@
 // Backup file format + validation + restore planning. Pure (no IndexedDB), so it can be tested outside the browser.
-import { STORES, DB_VERSION } from './db';
+import { STORES, DB_VERSION } from './schema';
+import { finiteIn, isIsoDate } from './validate';
+// FORMAT = version of the backup FILE layout; DB_VERSION = IndexedDB schema version. They are independent. Format 1 = legacy export (no format field, no meta/checksum).
 export const FORMAT = 2;
+export const LEGACY_FORMAT = 1;
+/** Format of a parsed backup object: a missing field means a legacy (format 1) file. */
+export const readFormat = (o: any): number => (o && o.format === undefined ? LEGACY_FORMAT : o?.format);
+// Steps that convert a backup object from format n to n+1 (pure, tested). 1 -> 2 only added meta/checksum, which are re-computed on export, so the data is unchanged.
+export const FORMAT_STEPS: Record<number, (o: any) => any> = { 1: (o) => ({ ...o, format: 2 }) };
+export function upgradeBackup(o: any): any { let cur = o, f = readFormat(o); while (f < FORMAT) { const step = FORMAT_STEPS[f]; if (!step) throw new Error('no-format-step:' + f); cur = step(cur); f = readFormat(cur); } return cur; }
 export type Data = Record<string, any[]>;
 const enc = new TextEncoder();
 export function stable(x: any): string {
@@ -28,12 +36,12 @@ export function rowIssue(store: string, r: any): string {
   if (typeof r.id !== 'string' || !r.id) return 'no-id';
   const id: string = r.id, str = (x: any) => typeof x === 'string' && x.length > 0;
   if (store === 'workouts') return Array.isArray(r.entries) && (id === 'draft' || (str(r.date) && !isNaN(Date.parse(r.date)))) ? '' : 'bad-session';
-  if (store === 'measurements') return str(r.date) && typeof r.weightKg === 'number' && isFinite(r.weightKg) ? '' : 'bad-weight';
+  if (store === 'measurements') return isIsoDate(r.date) && finiteIn(r.weightKg, 0.1, 700) ? '' : 'bad-weight';
   if (store === 'nutrition') {
     if (id.startsWith('log:') || id.startsWith('meal:')) return Array.isArray(r.entries) ? '' : 'bad-entries';
-    if (id.startsWith('food:') || id.startsWith('ref:')) return str(r.name) && r.per && typeof r.per === 'object' ? '' : 'bad-food';
+    if (id.startsWith('food:') || id.startsWith('ref:')) return str(r.name) && r.per && typeof r.per === 'object' && (['k', 'p', 'c', 'f'] as const).every((m) => r.per[m] == null || finiteIn(r.per[m], 0, 2000)) ? '' : 'bad-food';
     if (id === 'profile') return r.profile && typeof r.profile === 'object' ? '' : 'bad-profile';
-    if (id.startsWith('water:')) return typeof r.cups === 'number' ? '' : 'bad-water';
+    if (id.startsWith('water:')) return finiteIn(r.cups, 0, 1000) ? '' : 'bad-water';
     return '';
   }
   if (store === 'plans') {
@@ -45,15 +53,19 @@ export function rowIssue(store: string, r: any): string {
   if (store === 'exercises') return str(r.name) ? '' : 'bad-exercise';
   return '';
 }
-export type Validation = { ok: boolean; fatal: string[]; warnings: string[]; invalid: { store: string; id: string; reason: string }[]; dupes: number; unknownStores: string[]; data: Data; counts: Record<string, number>; exportedAt?: string; appVersion?: string; checksum: 'ok' | 'mismatch' | 'absent' | 'unsupported'; hasDraft: boolean };
+export type Validation = { ok: boolean; fatal: string[]; warnings: string[]; invalid: { store: string; id: string; reason: string }[]; dupes: number; unknownStores: string[]; data: Data; counts: Record<string, number>; exportedAt?: string; appVersion?: string; checksum: 'ok' | 'mismatch' | 'absent' | 'unsupported'; hasDraft: boolean; format?: number };
 export async function validateBackup(text: string, maxBytes = 60 * 1024 * 1024): Promise<Validation> {
   const v: Validation = { ok: false, fatal: [], warnings: [], invalid: [], dupes: 0, unknownStores: [], data: {}, counts: {}, checksum: 'absent', hasDraft: false };
   if (text.length > maxBytes) { v.fatal.push('too-big'); return v; }
   let o: any;
   try { o = JSON.parse(text); } catch { v.fatal.push('not-json'); return v; }
   if (!o || typeof o !== 'object' || o.app !== 'ironpath') { v.fatal.push('not-ironpath'); return v; }
+  const fmt = readFormat(o);
+  if (!Number.isInteger(fmt) || fmt < 1) { v.fatal.push('bad-format'); return v; }
+  if (fmt > FORMAT) { v.fatal.push('newer-format'); return v; }
   if (typeof o.version !== 'number' || o.version > DB_VERSION) { v.fatal.push('newer-version'); return v; }
   if (!o.data || typeof o.data !== 'object' || Array.isArray(o.data)) { v.fatal.push('no-data'); return v; }
+  v.format = fmt;
   v.exportedAt = typeof o.exportedAt === 'string' ? o.exportedAt : undefined; v.appVersion = typeof o.appVersion === 'string' ? o.appVersion : undefined;
   v.unknownStores = Object.keys(o.data).filter((k) => !(STORES as readonly string[]).includes(k));
   for (const s of STORES) {
