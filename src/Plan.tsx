@@ -109,7 +109,7 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
     const tog = (k: 'prio' | 'avoid', v: string) => setProf({ ...prof, [k]: prof[k].includes(v) ? prof[k].filter((x) => x !== v) : [...prof[k], v] });
     return (
       <section className="card">
-        <button className="ghost" onClick={() => setView('plans')}>{lang === 'ar' ? '→' : '←'} {p('back')}</button>
+        <button className="ghost" onClick={() => setView('plans')}><I n="chevl" s={18} /> {p('back')}</button>
         <h2><I n="compass" /> {p('newPlan')}</h2>
         {sel('goal', 'goal')}{sel('level', 'level')}{num('days', [2, 3, 4, 5, 6])}{num('dur', [30, 45, 60, 90])}{sel('equip', 'equip')}{sel('split', 'split')}
         <div><b>{p('prio')}</b><div className="chips">{MUSCLES.map((m) => <button key={m} className={'chip' + (prof.prio.includes(m) ? ' on' : '')} onClick={() => tog('prio', m)}>{T(m)}</button>)}</div></div>
@@ -124,7 +124,7 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
   if (view === 'edit' && cur) {
     return (
       <section className="card">
-        <button className="ghost" onClick={() => { setCur(null); setView('plans'); }}>{lang === 'ar' ? '→' : '←'} {p('back')}</button>
+        <button className="ghost" onClick={() => { setCur(null); setView('plans'); }}><I n="chevl" s={18} /> {p('back')}</button>
         <input placeholder={p('name')} value={cur.name} onChange={(e) => upd((c) => { c.name = e.target.value; })} />
         {cur.notes.map((n) => <p key={n} className="warn">{n === 'band' ? p('band') : `${p('miss')} ${T(n.split(':')[1])}`}</p>)}
         {cur.days.slice().sort((a, b) => ORDER.indexOf(a.weekday) - ORDER.indexOf(b.weekday)).map((d) => (
@@ -151,7 +151,7 @@ export default function PlanTab({ lang, onStart }: { lang: Lang; onStart: (d: Da
         ))}
         <p className="muted"><I n="trend" /> {p('prog')}</p><p className="muted"><I n="warn" /> {p('disc')}</p>
         {err}
-        <button className="primary" onClick={() => saveCur(false)}><I n="save" /> {isNew ? p('save') : p('save')}</button>
+        <button className="primary" onClick={() => saveCur(false)}><I n="save" /> {p('save')}</button>
         {!isNew && <button className="ghost" onClick={() => saveCur(true)}>{p('saveCopy')}</button>}
         <button className="ghost" onClick={() => { if (isNew || confirm(p('confirmReg'))) { setProf(cur.profile); setView('wizard'); } }}><I n="repeat" /> {p('regen')}</button>
       </section>

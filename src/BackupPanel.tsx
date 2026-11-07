@@ -26,7 +26,8 @@ const B: Record<string, [string, string]> = {
   go:['تنفيذ الاستعادة','Restore now'], confirm:['تأكيد أخير: تنفيذ الاستعادة؟','Final confirmation: restore now?'], working:['جارٍ الاستعادة…','Restoring…'],
   done:['اكتملت الاستعادة . أعد تحميل التطبيق لتظهر البيانات في كل الشاشات.','Restore finished . Reload the app so every screen shows the data.'], reload:['إعادة تحميل التطبيق','Reload app'], fail:['فشلت الاستعادة ولم يتغير شيء:','Restore failed and nothing was changed:'],
   snaps:['3) لقطات الأمان (للتراجع)','3) Safety snapshots (undo)'], noSnaps:['لا لقطات بعد.','No snapshots yet.'], r_before:['قبل استعادة','before restore'], r_wipe:['قبل حذف كل البيانات','before delete-all'], r_undo:['قبل التراجع','before undo'],
-  useSnap:['استعادة هذه اللقطة','Restore this snapshot'], confSnap:['استبدال بياناتك الحالية بهذه اللقطة؟ ستؤخذ لقطة جديدة قبل ذلك.','Replace your current data with this snapshot? A new snapshot is taken first.'], delSnap:['حذف','Delete'],
+  delSnap:['حذف لقطة الأمان هذه','Delete this safety snapshot'], confDelSnap:['حذف لقطة الأمان هذه نهائياً؟ لن تقدر تتراجع باستخدامها بعد الحذف.','Permanently delete this safety snapshot? You won\u2019t be able to use it to undo afterward.'],
+  useSnap:['استعادة هذه اللقطة','Restore this snapshot'], confSnap:['استبدال بياناتك الحالية بهذه اللقطة؟ ستؤخذ لقطة جديدة قبل ذلك.','Replace your current data with this snapshot? A new snapshot is taken first.'],
   rec:['استعادة الطوارئ','Recovery guide'], rec1:['إن فقدت بياناتك: افتح هذا القسم، واختر ملف النسخة من Files، وراجع المعاينة، ثم اختر «دمج» أو «استبدال».','If your data is lost: open this section, pick the backup file from Files, review the preview, then choose “Merge” or “Replace”.'], rec2:['احتفظ بأكثر من نسخة (iCloud Drive + جهاز آخر)، ونسخة جديدة أسبوعياً.','Keep more than one copy (iCloud Drive + another device) and make a new one weekly.'], rec3:['لا تعدّل الملف يدوياً؛ أي تعديل يغيّر بصمته.','Do not edit the file by hand; any edit changes its checksum.'],
   err:['خطأ: ','Error: '],
 };
@@ -148,7 +149,7 @@ export default function BackupPanel({ lang }: { lang: Lang }) {
       {snaps.map((s) => (
         <div key={s.id} className="row srow"><span style={{ flex: 1 }}>{new Date(s.ts).toLocaleString('sv').slice(0, 16)} · {b('r_' + s.reason.replace(/^before-(restore).*/, 'before').replace('before-wipe', 'wipe').replace('before-undo', 'undo'))}<br /><span className="muted">{s.counts.workouts} · {s.counts.measurements} · {s.counts.plans} · {s.counts.nutrition}</span></span>
           <button className="ghost" disabled={busy} onClick={() => useSnap(s.id)}>{b('useSnap')}</button>
-          <button className="ghost" onClick={async () => { await deleteSnapshot(s.id); loadSnaps(); }}><I n="trash" /></button></div>))}
+          <button className="ghost" aria-label={b('delSnap')} onClick={async () => { if (confirm(b('confDelSnap'))) { await deleteSnapshot(s.id); loadSnaps(); } }}><I n="trash" /></button></div>))}
 
       <b>{b('rec')}</b>
       <span className="muted">• {b('rec1')}<br />• {b('rec2')}<br />• {b('rec3')}</span>

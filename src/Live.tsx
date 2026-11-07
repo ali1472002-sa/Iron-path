@@ -20,6 +20,7 @@ const V: Record<string, [string, string]> = {
   alert:['تنبيه عند انتهاء الراحة (حيث يدعمه جهازك)','Alert when rest ends (where your device supports it)'], alertNote:['الاهتزاز والإشعارات قد لا تعمل في iPhone Safari؛ اعتمد على الشاشة.','Vibration/notifications may not work in iPhone Safari; rely on the screen.'],
   sumT:['ملخص الجلسة','Session summary'], dur:['المدة','Duration'], exs:['تمارين مكتملة','Exercises done'], st:['مجموعات مكتملة','Sets done'], rp:['تكرارات','Total reps'], vol:['الحجم (كغم × تكرار)','Volume (kg × reps)'],
   noLoad:['لا بيانات حمل كافية','not enough load data'], sk:['تمارين متخطاة','Skipped'], pr:['رقم شخصي مؤكد (أثقل مجموعة مكتملة)','Confirmed personal record (heaviest completed set)'], close:['إغلاق','Close'],
+  prevEx:['التمرين السابق','Previous exercise'], nextEx:['التمرين التالي','Next exercise'],
 };
 const clone = (x: any) => JSON.parse(JSON.stringify(x));
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -125,9 +126,9 @@ export default function Live({ lang, draft, save, hist, suggest, nm, cust, onFin
           <button className="ghost" onClick={() => mut((c) => { c.entries[cur].skipped = true; if (cur < c.entries.length - 1) c.cur = cur + 1; })}><I n="skip" /> {v('skipEx')}</button></div>}
         <div className="row"><input placeholder={'' + v('note')} value={e.note ?? ''} onChange={(ev) => mut((c) => { c.entries[cur].note = ev.target.value; })} /><button className={e.pain ? 'danger' : 'ghost'} onClick={() => mut((c) => { c.entries[cur].pain = !c.entries[cur].pain; })}>{v('pain')}</button></div>
       </div>
-      <div className="row"><button className="ghost big" disabled={cur === 0} onClick={() => mut((c) => { c.cur = cur - 1; })}>{lang === 'ar' ? '→' : '←'}</button>
+      <div className="row"><button className="ghost big" aria-label={v('prevEx')} disabled={cur === 0} onClick={() => mut((c) => { c.cur = cur - 1; })}><I n="chevl" s={20} /></button>
         <span className="muted" style={{ flex: 1, textAlign: 'center' }}>{v('next')}: {nxt ? name(nxt.exId) : v('none')}</span>
-        <button className="big" disabled={cur >= d.entries.length - 1} onClick={() => mut((c) => { c.cur = cur + 1; })}>{lang === 'ar' ? '←' : '→'}</button></div>
+        <button className="big" aria-label={v('nextEx')} disabled={cur >= d.entries.length - 1} onClick={() => mut((c) => { c.cur = cur + 1; })}><I n="chevr" s={20} /></button></div>
       <select value={pick} onChange={(ev) => addEx(ev.target.value)}><option value=""><I n="plus" /> {v('addEx')}</option>{[...(EXERCISES as any[]).map((x) => ({ id: x.id, name: x[lang] })), ...cust.map((c: any) => ({ id: c.id, name: c.name }))].map((x: any) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
       {d.entries.length > 1 && <button className="ghost" onClick={() => mut((c) => { c.entries.splice(cur, 1); c.cur = Math.max(0, cur - 1); })}><I n="trash" /> {v('rmEx')}</button>}
       <label className="row"><input type="checkbox" checked={d.autoRest !== false} onChange={(ev) => mut((c) => { c.autoRest = ev.target.checked; })} style={{ flex: 'none', minHeight: 0 }} /> {v('auto')}</label>

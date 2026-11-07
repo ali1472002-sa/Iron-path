@@ -14,6 +14,7 @@ const N: Record<string, [string, string]> = {
   kcal:['سعرة','kcal'], p:['بروتين','Protein'], c:['كربوهيدرات','Carbs'], f:['دهون','Fat'], g:['غ','g'], left:['المتبقي','Left'], target:['الهدف','Target'],
   noTarget:['أكمل ملفك الشخصي لتظهر الأهداف.','Complete your profile to see targets.'], search:['ابحث عن طعام…','Search foods…'], done:['تم','Done'],
   freq:['الأكثر استخداماً','Frequent'], saved:['وجباتي المحفوظة','Saved meals'], saveMeal:['حفظ كوجبة','Save as meal'], mealName:['اسم الوجبة','Meal name'],
+  prevDay:['اليوم السابق','Previous day'], nextDay:['اليوم التالي','Next day'], delFood:['حذف هذا الصنف','Remove this item'],
   approx:['≈ قيمة تقريبية','≈ approximate'], mine:['قيمة أدخلتها','your value'], none:['لا توجد نتائج','No results'], empty:['لا توجد وجبات مسجلة لهذا اليوم.','No meals logged for this day.'],
   age:['العمر','Age'], sex:['الجنس (مطلوب للمعادلة)','Sex (needed for the equation)'], m:['ذكر','Male'], fm:['أنثى','Female'], h:['الطول (سم)','Height (cm)'], w:['الوزن (كغم)','Weight (kg)'],
   goal:['الهدف','Goal'], gain:['زيادة عضل','Muscle gain'], loss:['خسارة دهون','Fat loss'], keep:['ثبات الوزن','Maintenance'], act:['مستوى النشاط','Activity level'],
@@ -159,9 +160,9 @@ export default function Nutrition({ lang }: { lang: Lang }) {
   );
   return (
     <section className="card">{tabs}
-      <div className="row"><button className="ghost" onClick={() => shift(-1)}><I n="chevl" /></button>
+      <div className="row"><button className="ghost" aria-label={n('prevDay')} onClick={() => shift(-1)}><I n="chevl" /></button>
         <input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
-        <button className="ghost" onClick={() => shift(1)}><I n="chevr" /></button></div>
+        <button className="ghost" aria-label={n('nextDay')} onClick={() => shift(1)}><I n="chevr" /></button></div>
       {err}
       <div className="ent"><b><I n="flame" /> {r(T.k)}{tg ? ` / ${tg.k}` : ''} {n('kcal')}{tg ? ` · ${n('left')} ${r(tg.k - T.k)}` : ''}</b>
         {tg && <Bar v={T.k} max={tg.k} />}{mac('p')}{mac('c')}{mac('f')}{!tg && <p className="muted">{n('noTarget')}</p>}</div>
@@ -170,12 +171,12 @@ export default function Nutrition({ lang }: { lang: Lang }) {
         const es = entries.filter((e) => e.meal === m);
         return (
           <div key={m} className="ent"><div className="row"><b style={{ flex: 1 }}>{n(m)} · {r(tot(es).k)} {n('kcal')}</b>
-            {es.length > 0 && <button className="ghost" onClick={() => { const nm = prompt(n('mealName')); if (nm) run(() => db.put('nutrition', { id: 'meal:' + crypto.randomUUID(), name: nm, entries: es.map(({ id, meal, ...x }) => x) })); }}><I n="save" /></button>}
+            {es.length > 0 && <button className="ghost" aria-label={n('saveMeal')} onClick={() => { const nm = prompt(n('mealName')); if (nm) run(() => db.put('nutrition', { id: 'meal:' + crypto.randomUUID(), name: nm, entries: es.map(({ id, meal, ...x }) => x) })); }}><I n="save" /></button>}
             <button className="ghost" onClick={() => { setAdding(adding === m ? '' : m); setQ(''); }}>{adding === m ? n('done') : <I n="plus" />}</button></div>
             {es.map((e) => (
               <div key={e.id} className="row srow"><span style={{ flex: 1 }}>{e.name}<br /><span className="muted">{r((e.per.k * e.g) / 100)} {n('kcal')} · {e.src === 'custom' ? n('mine') : n('approx')}</span></span>
                 <input style={{ maxWidth: 70 }} inputMode="decimal" value={e.g} onChange={(ev) => editG(e.id, +ev.target.value)} /><span className="muted">{n('g')}</span>
-                <button className="ghost" onClick={() => setEntries(entries.filter((x) => x.id !== e.id))}><I n="x" /></button></div>))}
+                <button className="ghost" aria-label={n('delFood')} onClick={() => setEntries(entries.filter((x) => x.id !== e.id))}><I n="x" /></button></div>))}
             {adding === m && (
               <div className="ent"><input placeholder={n('search')} value={q} onChange={(e) => setQ(e.target.value)} />
                 {!q && freq.length > 0 && <div className="chips">{freq.map((f) => <button key={f.id} className="chip" onClick={() => addFood(f, m)}>{f.name}</button>)}</div>}

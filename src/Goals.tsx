@@ -17,6 +17,7 @@ const G: Record<string, [string, string]> = {
   remain:['متبقٍ','left'], daysLeft:['أيام متبقية في الأسبوع','days left this week'], done:['اكتمل ','Complete '], na:['أكمل ملف التغذية لقياس هذا الهدف','Complete your nutrition profile to measure this goal'],
   volGate:['هدف الحجم يحتاج جلسات في أسبوعين على الأقل لتقدير هدف واقعي.','A volume goal needs sessions in at least 2 weeks to set a realistic target.'],
   last:['ملخص الأسبوع الماضي','Last week summary'], met:['أهداف مكتملة','goals met'], del:['حذف هذا الهدف؟','Delete this goal?'], motiv:['رسائل تحفيزية','Motivational messages'],
+  delGoal:['حذف الهدف','Delete goal'], cancel:['إلغاء','Cancel'],
   m1:['أكملت أهداف أسبوعك. الراحة والتعافي جزء من التقدم.','You completed this week’s goals. Rest and recovery are part of progress.'], m2:['تقدّم جيد. حافظ على وتيرة مريحة وآمنة.','Good progress. Keep a comfortable, safe pace.'],
   prompts:['إشعارات الإنجازات داخل التطبيق','Achievement prompts in the app'], unlocked:['تم فتح إنجاز جديد!','New achievement unlocked!'], locked:['مقفل','Locked'],
   first_workout:['أول تمرين مكتمل','First completed workout'], sessions_10:['10 جلسات مكتملة','10 completed sessions'], sessions_25:['25 جلسة مكتملة','25 completed sessions'],
@@ -160,7 +161,7 @@ export default function Goals({ lang }: { lang: Lang }) {
       {gl.length === 0 && <p className="muted">{g('none')}</p>}
       {res.map(({ x, p }) => (
         <div key={x.id} className={'ent' + (p.pct >= 100 ? ' pop' : '')}>
-          <div className="row"><b style={{ flex: 1 }}>{label(x)}</b><button className="ghost" onClick={() => confirm(g('del')) && saveGoals({ items: gl.filter((y) => y.id !== x.id) })}><I n="trash" /></button></div>
+          <div className="row"><b style={{ flex: 1 }}>{label(x)}</b><button className="ghost" aria-label={g('delGoal')} onClick={() => confirm(g('del')) && saveGoals({ items: gl.filter((y) => y.id !== x.id) })}><I n="trash" /></button></div>
           {p.value == null ? <p className="muted">{g('na')}</p> : <>
             <div className="bar"><i style={{ width: p.pct + '%' }} /></div>
             <span className="muted">{p.value}/{p.target} · {p.pct}% · {p.pct >= 100 ? g('done') : `${p.remaining} ${g('remain')} · ${daysLeft} ${g('daysLeft')}`}</span></>}
@@ -173,7 +174,7 @@ export default function Goals({ lang }: { lang: Lang }) {
           {weeksWithData < 2 && <span className="muted">{g('volGate')}</span>}
           {form.type === 'muscle' && <select value={form.muscle} onChange={(e) => setForm({ ...form, muscle: e.target.value })}>{MUSCLES.map((m) => <option key={m} value={m}>{nm(m)}</option>)}</select>}
           <label>{g('target')}<input inputMode="numeric" value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value })} /></label>
-          <button className="primary" onClick={saveGoal}><I n="save" /> {g('save')}</button><button className="ghost" onClick={() => setForm(null)}><I n="x" /></button>
+          <button className="primary" onClick={saveGoal}><I n="save" /> {g('save')}</button><button className="ghost" aria-label={g('cancel')} onClick={() => setForm(null)}><I n="x" /></button>
         </div>) : <button onClick={() => setForm({ type: 'workouts', muscle: 'chest', target: '3' })}><I n="plus" /> {g('add')}</button>}
       <label className="row"><input type="checkbox" checked={S.goals.motivation !== false} onChange={(e) => saveGoals({ motivation: e.target.checked })} style={{ flex: 'none', minHeight: 0 }} /> {g('motiv')}</label>
     </section>);

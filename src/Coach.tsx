@@ -19,6 +19,7 @@ const K: Record<string, [string, string]> = {
   tgt:['الحمل المخطط لهذا التمرين في الجلسات القادمة','Planned load for this exercise in future sessions'], swapT:['نسخة جديدة من الخطة مع استبدال التمرين (الخطة الأصلية تبقى كما هي)','A NEW copy of the plan with the exercise swapped (your original plan stays unchanged)'],
   noAuto:['لا يتغير شيء إلا بعد تأكيدك. الأحمال لا تُعدَّل تلقائياً.','Nothing changes until you confirm. Loads are never changed automatically.'],
   vol:['الحجم الأسبوعي (مجموعات عمل)','Weekly volume (working sets)'], wk:['الأسبوع','Week'], direct:['مباشر','direct'], indirect:['غير مباشر','indirect'], freq:['التكرار الأسبوعي (جلسات)','Weekly frequency (sessions)'],
+  prevWk:['الأسبوع السابق','Previous week'], nextWk:['الأسبوع التالي','Next week'],
   nodata:['لا سجلات في هذا الأسبوع (ليس صفراً)','No records this week (not zero)'], below:['أقل من مداك','below your range'], within:['ضمن مداك','within your range'], above:['أعلى من مداك','above your range'],
   mapMiss:['تمارين غير مربوطة بعضلة (لم تُحسب)','Exercises with no muscle mapping (not counted)'], mapCoarse:['تمارين بربط عام فقط (تُحسب للمجموعة لا للعضلة الدقيقة)','Group-level mapping only (counted for the group, not the fine muscle)'],
   ex:['أداء التمرين','Exercise performance'], date:['التاريخ','Date'], top:['أثقل مجموعة','Top set'], done:['منجز/مخطط','done/planned'], volL:['الحجم','Volume'], e1:['1RM تقديري','Est. 1RM'],
@@ -157,8 +158,8 @@ export default function Coach({ lang }: { lang: Lang }) {
       <section className="card" style={{ marginTop: 12 }}>
         <h3><I n="chart" /> {k('vol')}</h3>
         <div className="row" style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <button className="ghost" disabled={off >= 12} onClick={() => setOff(off + 1)}><I n="chevl" /></button><b>{k('wk')}: {wr[0]} → {wr[1]}</b>
-          <button className="ghost" disabled={off === 0} onClick={() => setOff(off - 1)}><I n="chevr" /></button></div>
+          <button className="ghost" aria-label={k('prevWk')} disabled={off >= 12} onClick={() => setOff(off + 1)}><I n="chevl" /></button><b>{k('wk')}: {wr[0]} → {wr[1]}</b>
+          <button className="ghost" aria-label={k('nextWk')} disabled={off === 0} onClick={() => setOff(off - 1)}><I n="chevr" /></button></div>
         {vol.sessions === 0 ? <p className="muted">{k('nodata')}</p> : <>
           {C.GROUPS.filter((g) => vol.grp[g] != null).map((g) => { const [lo, hi] = cfg.ranges[g] ?? [0, 999], n = vol.grp[g]; return (
             <div key={g}><div className="row"><b style={{ flex: 1 }}>{T(g)}</b><span>{n} · {k('freq').split(' ')[0]} {vol.freq[g] ?? 0}</span><span className="muted">{n < lo ? k('below') : n > hi ? k('above') : k('within')} ({lo}–{hi})</span></div>

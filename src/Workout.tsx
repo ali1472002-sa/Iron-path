@@ -14,6 +14,7 @@ const W: Record<string, [string, string]> = {
   start:['ابدأ التمرين','Start workout'], finish:['إنهاء وحفظ','Finish & save'], cancel:['إلغاء','Cancel'],
   kg:['كغم','kg'], reps:['تكرار','reps'], sets:['مجموعات','sets'], addSet:['مجموعة','Set'], rest:['الراحة','Rest'],
   hist:['السجل','History'], noHist:['لا توجد تمارين محفوظة','No saved workouts'], vol:['الحجم','Volume'],
+  removeEx:['إزالة التمرين','Remove exercise'], delHist:['حذف هذا التمرين المسجل','Delete this workout'], confDelHist:['حذف هذا التمرين المسجل نهائياً؟','Permanently delete this workout?'],
   up:['اقتراح: ارفع الوزن إلى','Suggestion: increase to'], keep:['اقتراح: ثبّت الوزن عند','Suggestion: stay at'],
   more:['اقتراح: حاول زيادة تكرار واحد','Suggestion: try one more rep'],
   note:['الاقتراح مبني على آخر تمرين لك: إن أكملت كل التكرارات المستهدفة يُقترح رفع 2.5 كغم.','Based on your last session: if you hit all target reps, +2.5 kg is suggested.'],
@@ -141,7 +142,7 @@ export default function Workout({ lang, link, clearLink }: { lang: Lang; link?: 
               <button className="ghost" onClick={() => editPlan(k, { reps: Math.max(1, p.reps - 1) })}>−</button>
               <span>{p.reps}</span>
               <button className="ghost" onClick={() => editPlan(k, { reps: p.reps + 1 })}>+</button>
-              <button className="ghost" onClick={() => removePlan(k)}><I n="x" /></button>
+              <button className="ghost" aria-label={w('removeEx')} onClick={() => removePlan(k)}><I n="x" /></button>
             </div>
           ))}
           <button className="primary" onClick={start}><I n="play" /> {plan.length ? w('start') : w('empty')}</button>{plan.length > 0 && <p className="muted">{w('note')}</p>}
@@ -153,7 +154,7 @@ export default function Workout({ lang, link, clearLink }: { lang: Lang; link?: 
         {hist.slice(0, 15).map((s) => (
           <div key={s.id} className="row srow">
             <span style={{ flex: 1 }}>{s.date.slice(0, 10)} · {s.entries.length} · {w('vol')} {volume(s)}</span>
-            <button className="ghost" onClick={async () => { await db.remove('workouts', s.id); load(); }}><I n="trash" /></button>
+            <button className="ghost" aria-label={w('delHist')} onClick={async () => { if (confirm(w('confDelHist'))) { await db.remove('workouts', s.id); load(); } }}><I n="trash" /></button>
           </div>
         ))}
       </section>

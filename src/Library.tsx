@@ -151,7 +151,7 @@ export default function Library({ lang }: { lang: Lang }) {
 
         <div className="row">
           <button className={plan.some((p) => p.exId === x.id) ? 'block' : 'primary block'} onClick={() => togglePlan(x.id)}><I n={plan.some((p) => p.exId === x.id) ? 'check' : 'plus'} /> {plan.some((p) => p.exId === x.id) ? u('inPlan') : u('addPlan')}</button>
-          {x.custom && <button className="danger" aria-label="delete" onClick={async () => { await db.remove('exercises', x.id); setOpen(''); load(); }}><I n="trash" /></button>}
+          {x.custom && <button className="danger" aria-label={u('delEx')} onClick={async () => { if (confirm(u('confDelEx'))) { await db.remove('exercises', x.id); setOpen(''); load(); } }}><I n="trash" /></button>}
         </div>
       </>
     );
